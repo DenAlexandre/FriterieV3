@@ -1,0 +1,33 @@
+https://github.com/unrealbg/BlazorShop?utm_source=chatgpt.com
+
+
+
+docker run --name postgres-shop -e POSTGRES_PASSWORD=postgres -e POSTGRES_USER=postgres -e POSTGRES_DB=blazorshop -v postgres-data:/var/lib/postgresql/data -p 5432:5432 -d postgres:latest
+
+
+//install si besoin
+dotnet tool install --global dotnet-ef
+
+
+
+dotnet ef database update --project BlazorShop.Infrastructure --startup-project BlazorShop.Presentation/BlazorShop.API
+
+
+
+
+
+
+dotnet run --project BlazorShop.Presentation/BlazorShop.API
+dotnet run --project BlazorShop.Presentation/BlazorShop.Web
+
+dotnet run --project BlazorShop.AppHost
+
+
+
+
+INSERT INTO public."Categories" ("Id", "Name") VALUES(gen_random_uuid(), 'Menus');
+INSERT INTO public."Categories" ("Id", "Name") VALUES(gen_random_uuid(), 'Burgers');
+INSERT INTO public."Categories" ("Id", "Name") VALUES(gen_random_uuid(), 'Sandwitchs');
+INSERT INTO public."Categories" ("Id", "Name") VALUES(gen_random_uuid(), 'Frites');
+INSERT INTO public."Categories" ("Id", "Name") VALUES(gen_random_uuid(), 'Sauces');
+INSERT INTO public."Categories" ("Id", "Name") VALUES(gen_random_uuid(), 'Viandes');
