@@ -1,0 +1,20 @@
+﻿namespace FriterieShop.Web.Shared.Models.Product
+{
+    using System.ComponentModel.DataAnnotations;
+
+    using FriterieShop.Web.Shared.Models.Category;
+
+    public class GetProduct : ProductBase
+    {
+        [Required]
+        public Guid Id { get; set; }
+
+        public GetCategory? Category { get; set; }
+
+        public DateTime CreatedOn { get; set; }
+
+        public bool IsNew => DateTime.UtcNow.Subtract(this.CreatedOn).TotalDays <= 7;
+
+        public IEnumerable<GetProductVariant> Variants { get; set; } = Array.Empty<GetProductVariant>();
+    }
+}
