@@ -7,7 +7,7 @@
                 </span>
                 <input type="text"
                        class="w-full rounded-lg border border-neutral-300 bg-white px-10 py-2.5 shadow-sm focus:outline-none focus:ring-1 focus:ring-black/10"
-                       placeholder="Search products…"
+                       placeholder="ex: rosty"
                        value="@_query"
                        @oninput="OnInput"
                        @onkeydown="OnKeyDown"
@@ -33,7 +33,7 @@
             </div>
             <button type="button" class="shrink-0 inline-flex items-center gap-2 rounded-md bg-neutral-900 text-white px-3 py-2 text-sm font-medium hover:bg-neutral-800"
                     @onclick="NavigateToQuery" disabled="@string.IsNullOrWhiteSpace(_query)">
-                Search
+                Rechercher
             </button>
         </div>
     </div>

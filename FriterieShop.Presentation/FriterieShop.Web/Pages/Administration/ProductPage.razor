@@ -47,7 +47,7 @@
                                             <th class="px-3 py-2">Image</th>
                                             <th class="px-3 py-2">Name</th>
                                             <th class="px-3 py-2">Description</th>
-                                            <th class="px-3 py-2">Price</th>
+                                            <th class="px-3 py-2">Prix</th>
                                             <th class="px-3 py-2">Quantity</th>
                                             <th class="px-3 py-2">Created Date</th>
                                             <th class="px-3 py-2 text-center">Actions</th>
@@ -86,7 +86,7 @@
             else
             {
                 <div class="mt-6 rounded-md bg-blue-50 text-blue-800 px-6 py-5 text-center shadow font-semibold">
-                    No products found.
+                    Aucun produits trouvés.
                 </div>
             }
         </div>
@@ -113,27 +113,27 @@
             <EditForm Model="_product" OnValidSubmit="SaveProduct">
                 <DataAnnotationsValidator />
                 <div class="form-group mb-3">
-                    <label class="block text-xs text-neutral-600 mb-1">Product Name</label>
+                    <label class="block text-xs text-neutral-600 mb-1">Nom du produit</label>
                     <InputText @bind-Value="_product.Name" class="w-full border rounded px-3 py-2" />
                     <ValidationMessage For="@(() => _product.Name)" />
                 </div>
                 <div class="form-group mb-3">
-                    <label class="block text-xs text-neutral-600 mb-1">Price</label>
+                    <label class="block text-xs text-neutral-600 mb-1">Prix</label>
                     <InputNumber @bind-Value="_product.Price" class="w-full border rounded px-3 py-2" />
                     <ValidationMessage For="@(() => _product.Price)" />
                 </div>
                 <div class="form-group mb-3">
-                    <label class="block text-xs text-neutral-600 mb-1">Quantity</label>
+                    <label class="block text-xs text-neutral-600 mb-1">Quantité</label>
                     <InputNumber @bind-Value="_product.Quantity" class="w-full border rounded px-3 py-2" />
                     <ValidationMessage For="@(() => _product.Quantity)" />
                 </div>
                 <div class="form-group mb-3">
-                    <label class="block text-xs text-neutral-600 mb-1">Product Description</label>
+                    <label class="block text-xs text-neutral-600 mb-1">Description</label>
                     <InputTextArea @bind-Value="_product.Description" class="w-full border rounded px-3 py-2" />
                     <ValidationMessage For="@(() => _product.Description)" />
                 </div>
                 <div class="form-group mb-3">
-                    <label for="category" class="block text-xs text-neutral-600 mb-1">Category</label>
+                    <label for="category" class="block text-xs text-neutral-600 mb-1">Categorie</label>
                     <InputSelect id="category" class="w-full border rounded px-3 py-2" @bind-Value="_product.CategoryId">
                         <option value="" selected>-- Select a Category --</option>
                         @foreach (var category in _categories ?? Array.Empty<GetCategory>())
@@ -213,7 +213,7 @@
                                     <th class="px-2 py-1">SizeScale</th>
                                     <th class="px-2 py-1">Size</th>
                                     <th class="px-2 py-1">SKU</th>
-                                    <th class="px-2 py-1">Price</th>
+                                    <th class="px-2 py-1">Prix</th>
                                     <th class="px-2 py-1">Stock</th>
                                     <th class="px-2 py-1">Color</th>
                                     <th class="px-2 py-1">Default</th>
@@ -379,7 +379,7 @@
                                     <th class="px-2 py-1">SizeScale</th>
                                     <th class="px-2 py-1">Size</th>
                                     <th class="px-2 py-1">SKU</th>
-                                    <th class="px-2 py-1">Price</th>
+                                    <th class="px-2 py-1">Prix</th>
                                     <th class="px-2 py-1">Stock</th>
                                     <th class="px-2 py-1">Color</th>
                                     <th class="px-2 py-1">Default</th>
