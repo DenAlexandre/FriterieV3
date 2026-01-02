@@ -46,17 +46,17 @@ namespace FriterieShop.API
 
 
 
-                options.AddPolicy("Frontend", policy =>
-                {
-                    policy
-                        .SetIsOriginAllowed(origin =>
-                        {
-                            var uri = new Uri(origin);
-                            return uri.Host == "localhost";
-                        })
-                        .AllowAnyHeader()
-                        .AllowAnyMethod();
-                });
+                //options.AddPolicy("Frontend", policy =>
+                //{
+                //    policy
+                //        .SetIsOriginAllowed(origin =>
+                //        {
+                //            var uri = new Uri(origin);
+                //            return uri.Host == "localhost";
+                //        })
+                //        .AllowAnyHeader()
+                //        .AllowAnyMethod();
+                //});
             });
 
 #if DEBUG
