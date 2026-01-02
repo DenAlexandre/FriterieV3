@@ -1,8 +1,24 @@
+Exemples:
+
+https://commandes.chrisburger.fr/home/places
+https://burgergrill.netclik.co/
+https://www.myfood-loison.fr/restaurant/harnes/Z6
+
+
+login:
+
+den.alexandre@gmail.com
+Alex@ndre235
+
+
+
+
+
 https://github.com/unrealbg/BlazorShop?utm_source=chatgpt.com
 
 
 
-docker run --name postgres-shop -e POSTGRES_PASSWORD=postgres -e POSTGRES_USER=postgres -e POSTGRES_DB=blazorshop -v postgres-data:/var/lib/postgresql/data -p 5432:5432 -d postgres:latest
+docker run --name postgres-shop -e POSTGRES_PASSWORD=postgres -e POSTGRES_USER=postgres -e POSTGRES_DB=db-shop -v postgres-data:/var/lib/postgresql/data -p 5432:5432 -d postgres:latest
 
 
 //install si besoin
@@ -10,17 +26,17 @@ dotnet tool install --global dotnet-ef
 
 
 
-dotnet ef database update --project BlazorShop.Infrastructure --startup-project BlazorShop.Presentation/BlazorShop.API
+dotnet ef database update --project FriterieShop.Infrastructure --startup-project FriterieShop.Presentation/FriterieShop.API
 
 
 
 
 
 
-dotnet run --project BlazorShop.Presentation/BlazorShop.API
-dotnet run --project BlazorShop.Presentation/BlazorShop.Web
+dotnet run --project FriterieShop.Presentation/FriterieShop.API
+dotnet run --project FriterieShop.Presentation/FriterieShop.Web
 
-dotnet run --project BlazorShop.AppHost
+dotnet run --project FriterieShop.AppHost
 
 
 

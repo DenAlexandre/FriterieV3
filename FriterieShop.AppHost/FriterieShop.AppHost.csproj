@@ -9,8 +9,8 @@
     <UserSecretsId>d3573504-3570-47c0-8129-3287c9a91907</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Aspire.Hosting.AppHost" Version="13.0.2" />
-    <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="13.0.2" />
+    <PackageReference Include="Aspire.Hosting.AppHost" Version="13.1.0" />
+    <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="13.1.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FriterieShop.Presentation\FriterieShop.API\FriterieShop.API.csproj" />
