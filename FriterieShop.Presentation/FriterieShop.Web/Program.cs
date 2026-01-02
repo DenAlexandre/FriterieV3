@@ -31,6 +31,9 @@ namespace FriterieShop.Web
             builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
             builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
             builder.Services.AddScoped<RefreshTokenHandler>();
+
+            var apiBase = new Uri(new Uri(builder.HostEnvironment.BaseAddress), "api/");
+
 #if DEBUG
             builder.Services.AddHttpClient(
                 Constant.ApiClient.Name,
@@ -38,8 +41,14 @@ namespace FriterieShop.Web
                     {
                         opt.BaseAddress = new Uri("https://localhost:7094/api/");
                     }).AddHttpMessageHandler<RefreshTokenHandler>();
+
+
+            //builder.Services.AddHttpClient(
+            // Constant.ApiClient.Name,
+            // client => { client.BaseAddress = apiBase; }
+            // ).AddHttpMessageHandler<RefreshTokenHandler>();
 #else
-            var apiBase = new Uri(new Uri(builder.HostEnvironment.BaseAddress), "api/");
+
 
             builder.Services.AddHttpClient(
                 Constant.ApiClient.Name,
