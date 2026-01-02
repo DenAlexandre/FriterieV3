@@ -1,16 +1,13 @@
 namespace FriterieShop.API
 {
-    using System.Text.Json.Serialization;
-
     using FriterieShop.Application;
     using FriterieShop.Infrastructure;
     using FriterieShop.Infrastructure.Data;
-
     using Microsoft.AspNetCore.Builder;
     using Microsoft.Extensions.FileProviders;
     using Microsoft.Extensions.Hosting;
-
     using Serilog;
+    using System.Text.Json.Serialization;
 
     public class Program
     {
@@ -36,26 +33,42 @@ namespace FriterieShop.API
 
             builder.Services.AddInfrastructure(builder.Configuration);
             builder.Services.AddApplication(builder.Configuration);
-            builder.Services.AddCors(
-                co =>
-                    {
-                        co.AddDefaultPolicy(
-                            opt =>
-                                {
-                                    opt.AllowAnyHeader()
-                                        .AllowAnyMethod()
-                                        .AllowCredentials()
-                                    //.WithOrigins("https://localhost:7258");
-                                        .SetIsOriginAllowed(origin =>
-#if DEBUG 
-                                  origin.StartsWith("http://localhost") ||
-                                            origin.StartsWith("https://localhost"));
+            builder.Services.AddCors(options =>
+            {
+
+                options.AddDefaultPolicy(policy =>
+                {
+                    policy
+                        .AllowAnyOrigin()
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                });
+
+
+
+                options.AddPolicy("Frontend", policy =>
+                {
+                    policy
+                        .SetIsOriginAllowed(origin =>
+                        {
+                            var uri = new Uri(origin);
+                            return uri.Host == "localhost";
+                        })
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                });
+            });
+
+#if DEBUG
+            //.SetIsOriginAllowed(origin =>
+            //origin.StartsWith("http://localhost") ||
+            //          origin.StartsWith("https://localhost"));
 #else
-                                origin.StartsWith("http://shop.mydomain.com") ||
-                                            origin.StartsWith("https://shop.mydomain.com"));
+                                //origin.StartsWith("http://shop.mydomain.com") ||
+                                //            origin.StartsWith("https://shop.mydomain.com"));
 #endif
-                                });
-                    });
+
+        
 
             try
             {
@@ -76,8 +89,8 @@ namespace FriterieShop.API
                     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
                     db.Database.EnsureCreated();
                 }
-
                 app.UseCors();
+                //app.UseCors("Frontend");
                 app.UseSerilogRequestLogging();
 
                 // Configure the HTTP request pipeline.
