@@ -41,7 +41,8 @@ namespace FriterieShop.Web
                 Constant.ApiClient.Name,
                 opt =>
                 {
-                    opt.BaseAddress = new Uri("https://sem2pzd6ab:7094/api/");
+                    opt.BaseAddress = new Uri("https://localhost:7094/api/");
+                    //opt.BaseAddress = new Uri("https://sem2pzd6ab:7094/api/");
                 })
                 .AddHttpMessageHandler<RefreshTokenHandler>();
 
