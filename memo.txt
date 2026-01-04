@@ -40,10 +40,26 @@ dotnet run --project FriterieShop.AppHost
 
 
 
+//Pour docker
 
-INSERT INTO public."Categories" ("Id", "Name") VALUES(gen_random_uuid(), 'Menus');
-INSERT INTO public."Categories" ("Id", "Name") VALUES(gen_random_uuid(), 'Burgers');
-INSERT INTO public."Categories" ("Id", "Name") VALUES(gen_random_uuid(), 'Sandwitchs');
-INSERT INTO public."Categories" ("Id", "Name") VALUES(gen_random_uuid(), 'Frites');
-INSERT INTO public."Categories" ("Id", "Name") VALUES(gen_random_uuid(), 'Sauces');
-INSERT INTO public."Categories" ("Id", "Name") VALUES(gen_random_uuid(), 'Viandes');
+dotnet aspire publish
+
+dotnet publish -c Release -o docker-compose-artifacts
+
+
+
+cd FriterieShop.Presentation
+dotnet publish FriterieShop.API/FriterieShop.API.csproj -c Release -o publish/api
+dotnet publish FriterieShop.Web/FriterieShop.Web.csproj -c Release -o publish/web
+
+
+
+dotnet clean
+dotnet build
+docker-compose build
+
+
+
+
+
+

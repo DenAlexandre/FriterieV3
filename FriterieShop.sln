@@ -23,6 +23,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FriterieShop.ServiceDefault
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FriterieShop.AppHost", "FriterieShop.AppHost\FriterieShop.AppHost.csproj", "{4A9A7AE4-BEA4-32B7-152E-7DC51110F138}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Éléments de solution", "Éléments de solution", "{243C5533-B936-4A02-88C9-68DBF8EE6821}"
+	ProjectSection(SolutionItems) = preProject
+		docker-compose - Copie.yml = docker-compose - Copie.yml
+		docker-compose.yml = docker-compose.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

@@ -1,0 +1,39 @@
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      POSTGRES_DB: db-shop
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data 
+
+  api:
+    build:
+      context: .
+      dockerfile: ./FriterieShop.Presentation/FriterieShop.API/Dockers/Dockerfile
+    depends_on:
+      - postgres
+    environment:
+      ConnectionStrings__Postgres: "Host=postgres;Database=db-shop;Username=postgres;Password=postgres"
+      ASPNETCORE_URLS: "http://+:80"
+    ports:
+      - "7258:80"
+
+  web:
+    build:
+      context: .
+      dockerfile: ./FriterieShop.Presentation/FriterieShop.Web/Dockers/Dockerfile
+    depends_on:
+      - api
+    environment:
+      Api_BaseUrl: "http://api/api/"
+      ASPNETCORE_URLS: "http://+:80"
+    ports:
+      - "7094:80"
+
+volumes:
+  postgres-data:

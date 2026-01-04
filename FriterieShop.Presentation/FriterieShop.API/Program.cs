@@ -73,16 +73,7 @@ namespace FriterieShop.API
             try
             {
                 var app = builder.Build();
-#if DEBUG
 
-#else
-                app.UseForwardedHeaders(new ForwardedHeadersOptions
-                {
-                    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
-                    KnownProxies = { IPAddress.Parse("1.1.1.200") },
-                    ForwardLimit = 1
-                });
-#endif
                 // Create database schema at startup (no migrations present yet)
                 using (var scope = app.Services.CreateScope())
                 {

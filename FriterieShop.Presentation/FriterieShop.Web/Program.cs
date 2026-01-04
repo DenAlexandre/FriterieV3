@@ -35,19 +35,27 @@ namespace FriterieShop.Web
             var apiBase = new Uri(new Uri(builder.HostEnvironment.BaseAddress), "api/");
 
 
+            //var apiBaseUrl = builder.Configuration["Api:BaseUrl"];
+
+            //builder.Services.AddHttpClient(
+            //    Constant.ApiClient.Name,
+            //    opt =>
+            //    {
+            //        opt.BaseAddress = new Uri("https://localhost:7094/api/");
+            //        //opt.BaseAddress = new Uri("https://sem2pzd6ab:7094/api/");
+            //    })
+            //    .AddHttpMessageHandler<RefreshTokenHandler>();
+
+
             var apiBaseUrl = builder.Configuration["Api:BaseUrl"];
 
             builder.Services.AddHttpClient(
                 Constant.ApiClient.Name,
                 opt =>
                 {
-                    opt.BaseAddress = new Uri("https://localhost:7094/api/");
-                    //opt.BaseAddress = new Uri("https://sem2pzd6ab:7094/api/");
+                    opt.BaseAddress = new Uri(apiBaseUrl);
                 })
                 .AddHttpMessageHandler<RefreshTokenHandler>();
-
-
-
 
 
 
