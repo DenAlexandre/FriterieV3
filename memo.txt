@@ -39,6 +39,11 @@ dotnet run --project FriterieShop.Presentation/FriterieShop.Web
 dotnet run --project FriterieShop.AppHost
 
 
+https://localhost:7258/
+https://localhost:7094/swagger/index.html
+
+
+
 
 //Pour docker
 
@@ -54,12 +59,12 @@ dotnet publish FriterieShop.Web/FriterieShop.Web.csproj -c Release -o publish/we
 
 
 
-dotnet clean
-dotnet build
-docker-compose build
+docker compose down -v
+docker compose build --no-cache
+docker compose up -d
+docker compose logs -f
 
 
 
-
-
-
+//Pour tester l'aPI
+docker build -f FriterieShop.Presentation/FriterieShop.API/Dockers/Dockerfile -t friterie-api:latest ./Friterie.API

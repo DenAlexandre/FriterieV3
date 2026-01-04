@@ -8,7 +8,7 @@ namespace FriterieShop.Web
     using FriterieShop.Web.Shared.Helper.Contracts;
     using FriterieShop.Web.Shared.Services;
     using FriterieShop.Web.Shared.Services.Contracts;
-
+    using Microsoft.Extensions.Configuration;
     using Microsoft.AspNetCore.Components.Authorization;
     using Microsoft.AspNetCore.Components.Web;
     using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -18,6 +18,7 @@ namespace FriterieShop.Web
         public static async Task Main(string[] args)
         {
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
+
             builder.RootComponents.Add<App>("#app");
             builder.RootComponents.Add<HeadOutlet>("head::after");
 
@@ -32,7 +33,18 @@ namespace FriterieShop.Web
             builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
             builder.Services.AddScoped<RefreshTokenHandler>();
 
-            var apiBase = new Uri(new Uri(builder.HostEnvironment.BaseAddress), "api/");
+            //var apiBase = new Uri(new Uri(builder.HostEnvironment.BaseAddress), "api/");
+            //var apiBaseUrl = builder.Configuration["Api:BaseUrl"];
+
+            builder.Services.AddHttpClient(
+                Constant.ApiClient.Name,
+                opt =>
+                {
+
+                    opt.BaseAddress = new Uri("https://localhost:7094/api/");
+                    //opt.BaseAddress = new Uri("https://sem2pzd6ab:7094/api/");
+                })
+                .AddHttpMessageHandler<RefreshTokenHandler>();
 
 
             //var apiBaseUrl = builder.Configuration["Api:BaseUrl"];
@@ -41,21 +53,9 @@ namespace FriterieShop.Web
             //    Constant.ApiClient.Name,
             //    opt =>
             //    {
-            //        opt.BaseAddress = new Uri("https://localhost:7094/api/");
-            //        //opt.BaseAddress = new Uri("https://sem2pzd6ab:7094/api/");
+            //        opt.BaseAddress = new Uri(apiBaseUrl);
             //    })
             //    .AddHttpMessageHandler<RefreshTokenHandler>();
-
-
-            var apiBaseUrl = builder.Configuration["Api:BaseUrl"];
-
-            builder.Services.AddHttpClient(
-                Constant.ApiClient.Name,
-                opt =>
-                {
-                    opt.BaseAddress = new Uri(apiBaseUrl);
-                })
-                .AddHttpMessageHandler<RefreshTokenHandler>();
 
 
 

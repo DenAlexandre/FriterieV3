@@ -58,16 +58,6 @@ namespace FriterieShop.API
                 //        .AllowAnyMethod();
                 //});
             });
-
-#if DEBUG
-            //.SetIsOriginAllowed(origin =>
-            //origin.StartsWith("http://localhost") ||
-            //          origin.StartsWith("https://localhost"));
-#else
-                                //origin.StartsWith("http://shop.mydomain.com") ||
-                                //            origin.StartsWith("https://shop.mydomain.com"));
-#endif
-
         
 
             try
@@ -80,8 +70,10 @@ namespace FriterieShop.API
                     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
                     db.Database.EnsureCreated();
                 }
+
                 app.UseCors();
                 //app.UseCors("Frontend");
+
                 app.UseSerilogRequestLogging();
 
                 // Configure the HTTP request pipeline.

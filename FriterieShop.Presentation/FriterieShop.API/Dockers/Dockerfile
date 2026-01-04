@@ -22,7 +22,7 @@ COPY FriterieShop.Domain/ FriterieShop.Domain/
 RUN dotnet publish FriterieShop.Presentation/FriterieShop.API/FriterieShop.API.csproj -c Release -o /app
 
 # -------- Runtime --------
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
 EXPOSE 80
 
