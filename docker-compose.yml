@@ -19,9 +19,9 @@ services:
       - postgres
     environment:
       ConnectionStrings__Postgres: "Host=postgres;Database=db-shop;Username=postgres;Password=postgres"
-      ASPNETCORE_URLS: "http://+:7094"
+      ASPNETCORE_URLS: "http://+:8080"
     ports:
-      - "7094:7094"
+      - "7094:8080"
 
   web:
     build:
