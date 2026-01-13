@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FriterieShop.AppHost", "Fri
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Éléments de solution", "Éléments de solution", "{243C5533-B936-4A02-88C9-68DBF8EE6821}"
 	ProjectSection(SolutionItems) = preProject
+		.dockerignore = .dockerignore
+		.env.example = .env.example
 		docker-compose - Copie.yml = docker-compose - Copie.yml
 		docker-compose.yml = docker-compose.yml
 	EndProjectSection

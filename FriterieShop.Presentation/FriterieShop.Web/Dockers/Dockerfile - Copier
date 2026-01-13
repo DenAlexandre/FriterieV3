@@ -2,10 +2,9 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
-RUN apt-get update && apt-get install -y curl \
-    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
-    && apt-get install -y nodejs \
-    && npm install -g npm@latest
+# Installer Node.js (pour npm)
+RUN apt-get update && apt-get install -y nodejs npm
+
 
 COPY FriterieShop.Presentation/FriterieShop.Web/FriterieShop.Web.csproj FriterieShop.Presentation/FriterieShop.Web/
 COPY FriterieShop.Presentation/FriterieShop.Web.Shared/FriterieShop.Web.Shared.csproj FriterieShop.Presentation/FriterieShop.Web.Shared/
@@ -14,10 +13,7 @@ RUN dotnet restore FriterieShop.Presentation/FriterieShop.Web/FriterieShop.Web.c
 
 COPY FriterieShop.Presentation/FriterieShop.Web/ FriterieShop.Presentation/FriterieShop.Web/
 COPY FriterieShop.Presentation/FriterieShop.Web.Shared/ FriterieShop.Presentation/FriterieShop.Web.Shared/
-
-RUN pwd 
 RUN dotnet publish FriterieShop.Presentation/FriterieShop.Web/FriterieShop.Web.csproj -c Release -o /app
-
 
 # -------- Runtime (Nginx) --------
 FROM nginx:alpine

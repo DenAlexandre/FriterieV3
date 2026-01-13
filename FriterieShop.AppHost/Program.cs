@@ -16,7 +16,7 @@ var compose = builder.AddDockerComposeEnvironment("compose");
 var postgres = builder.AddPostgres("postgres")
     .WithImage("postgres:latest")
     .WithHostPort(5432)
-    .WithEnvironment("POSTGRES_DB", "db-shop")
+    .WithEnvironment("POSTGRES_DB", "db_shop")
     .WithEnvironment("POSTGRES_USER", "postgres")
     .WithEnvironment("POSTGRES_PASSWORD", "postgres")
     .WithDataVolume(); // persistance des données

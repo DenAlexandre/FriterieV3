@@ -1,39 +1,63 @@
 services:
   postgres:
     image: postgres:latest
-    container_name: postgres
+    container_name: shop_postgres
     environment:
-      POSTGRES_DB: db-shop
+      POSTGRES_DB: db_shop
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
       - "5432:5432"
     volumes:
-      - postgres-data:/var/lib/postgresql/data 
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - friterieshop-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   api:
+    container_name: shop_api
     build:
       context: .
       dockerfile: ./FriterieShop.Presentation/FriterieShop.API/Dockers/Dockerfile
     depends_on:
       - postgres
+    networks:
+      - friterieshop-network
     environment:
-      ConnectionStrings__Postgres: "Host=postgres;Database=db-shop;Username=postgres;Password=postgres"
+      ConnectionStrings__Postgres: "Host=postgres;Database=db_shop;Username=postgres;Password=postgres"
       ASPNETCORE_URLS: "http://+:8080"
     ports:
-      - "7094:8080"
+      - "5282:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   web:
+    container_name: shop_web
     build:
       context: .
       dockerfile: ./FriterieShop.Presentation/FriterieShop.Web/Dockers/Dockerfile
     depends_on:
       - api
+    networks:
+      - friterieshop-network
     environment:
-      Api_BaseUrl: "http://api:7094"
+      Api_BaseUrl: "http://api/api/"
       ASPNETCORE_URLS: "http://+:80"
     ports:
-      - "7258:80"
+      - "5209:80"
 
 volumes:
   postgres-data:
+    driver: local
+
+networks:
+  friterieshop-network:
+    driver: bridge
