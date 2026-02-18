@@ -10,7 +10,11 @@
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-4" style="min-height:75vh">
 
     @* ── Colonne 1 : En attente ── *@
-    <div class="flex flex-col rounded-xl border-2 border-orange-300 bg-orange-50/60">
+    <div class="@ColumnCss(ColPending, "orange")"
+         @ondragover="OnDragOver" @ondragover:preventDefault
+         @ondragenter="() => OnDragEnter(ColPending)"
+         @ondragleave="OnDragLeaveHandler"
+         @ondrop="() => OnDrop(ColPending)" @ondrop:preventDefault>
       <div class="sticky top-0 z-10 flex items-center justify-between px-4 py-3 bg-orange-100 rounded-t-xl border-b border-orange-300">
         <h3 class="font-bold text-orange-800">En attente</h3>
         <span class="rounded-full bg-orange-200 text-orange-900 px-2.5 py-0.5 text-xs font-bold">@PendingOrders.Count()</span>
@@ -20,7 +24,12 @@
         {
           @foreach (var o in PendingOrders.OrderByDescending(x => x.CreatedOn))
           {
-            @RenderOrderCard(o, "border-orange-300")
+            <div draggable="true"
+                 class="@CardCss(o.Id, "orange")"
+                 @ondragstart="() => OnDragStart(o)"
+                 @ondragend="OnDragEnd">
+              @RenderCardContent(o)
+            </div>
           }
         }
         else
@@ -31,7 +40,11 @@
     </div>
 
     @* ── Colonne 2 : En cours ── *@
-    <div class="flex flex-col rounded-xl border-2 border-blue-300 bg-blue-50/60">
+    <div class="@ColumnCss(ColInProgress, "blue")"
+         @ondragover="OnDragOver" @ondragover:preventDefault
+         @ondragenter="() => OnDragEnter(ColInProgress)"
+         @ondragleave="OnDragLeaveHandler"
+         @ondrop="() => OnDrop(ColInProgress)" @ondrop:preventDefault>
       <div class="sticky top-0 z-10 flex items-center justify-between px-4 py-3 bg-blue-100 rounded-t-xl border-b border-blue-300">
         <h3 class="font-bold text-blue-800">En cours</h3>
         <span class="rounded-full bg-blue-200 text-blue-900 px-2.5 py-0.5 text-xs font-bold">@InProgressOrders.Count()</span>
@@ -41,7 +54,12 @@
         {
           @foreach (var o in InProgressOrders.OrderByDescending(x => x.CreatedOn))
           {
-            @RenderOrderCard(o, "border-blue-300")
+            <div draggable="true"
+                 class="@CardCss(o.Id, "blue")"
+                 @ondragstart="() => OnDragStart(o)"
+                 @ondragend="OnDragEnd">
+              @RenderCardContent(o)
+            </div>
           }
         }
         else
@@ -52,7 +70,11 @@
     </div>
 
     @* ── Colonne 3 : Terminé ── *@
-    <div class="flex flex-col rounded-xl border-2 border-green-300 bg-green-50/60">
+    <div class="@ColumnCss(ColDelivered, "green")"
+         @ondragover="OnDragOver" @ondragover:preventDefault
+         @ondragenter="() => OnDragEnter(ColDelivered)"
+         @ondragleave="OnDragLeaveHandler"
+         @ondrop="() => OnDrop(ColDelivered)" @ondrop:preventDefault>
       <div class="sticky top-0 z-10 flex items-center justify-between px-4 py-3 bg-green-100 rounded-t-xl border-b border-green-300">
         <h3 class="font-bold text-green-800">Termin&eacute;</h3>
         <span class="rounded-full bg-green-200 text-green-900 px-2.5 py-0.5 text-xs font-bold">@DeliveredOrders.Count()</span>
@@ -62,7 +84,12 @@
         {
           @foreach (var o in DeliveredOrders.OrderByDescending(x => x.CreatedOn))
           {
-            @RenderOrderCard(o, "border-green-300")
+            <div draggable="true"
+                 class="@CardCss(o.Id, "green")"
+                 @ondragstart="() => OnDragStart(o)"
+                 @ondragend="OnDragEnd">
+              @RenderCardContent(o)
+            </div>
           }
         }
         else
@@ -81,6 +108,15 @@
   private List<GetOrder> _orders = new();
   private CancellationTokenSource _cts = new();
   private const int PollIntervalSeconds = 15;
+
+  // Column identifiers
+  private const string ColPending = "PendingShipment";
+  private const string ColInProgress = "InProgress";
+  private const string ColDelivered = "Delivered";
+
+  // Drag & drop state
+  private Guid? _draggedOrderId;
+  private string? _dragOverColumn;
 
   private IEnumerable<GetOrder> PendingOrders => _orders.Where(o => o.ShippingStatus == "PendingShipment");
   private IEnumerable<GetOrder> InProgressOrders => _orders.Where(o => o.ShippingStatus is "Shipped" or "InTransit" or "OutForDelivery");
@@ -116,35 +152,133 @@
         : (await ApiCallHelper.GetServiceResponse<IEnumerable<GetOrder>>(http)).ToList();
   }
 
+  // ── Drag & Drop ──
+
+  private void OnDragStart(GetOrder order)
+  {
+    _draggedOrderId = order.Id;
+  }
+
+  private void OnDragEnd()
+  {
+    _draggedOrderId = null;
+    _dragOverColumn = null;
+  }
+
+  private void OnDragOver(DragEventArgs e) { }
+
+  private void OnDragEnter(string column)
+  {
+    if (_draggedOrderId.HasValue)
+      _dragOverColumn = column;
+  }
+
+  private void OnDragLeaveHandler(DragEventArgs e)
+  {
+    _dragOverColumn = null;
+  }
+
+  private async Task OnDrop(string targetColumn)
+  {
+    _dragOverColumn = null;
+
+    if (_draggedOrderId is null) return;
+
+    var order = _orders.FirstOrDefault(o => o.Id == _draggedOrderId.Value);
+    _draggedOrderId = null;
+    if (order is null) return;
+
+    var newStatus = targetColumn switch
+    {
+      ColPending => "PendingShipment",
+      ColInProgress => "Shipped",
+      ColDelivered => "Delivered",
+      _ => null
+    };
+
+    if (newStatus is null || order.ShippingStatus == newStatus) return;
+
+    // Optimistic UI update
+    order.ShippingStatus = newStatus;
+    StateHasChanged();
+
+    // Call API
+    try
+    {
+      var client = await HttpClientHelper.GetPrivateClientAsync();
+      var route = $"{Constant.Cart.UpdateShippingStatus}/{order.Id}/shipping-status";
+      var body = new { shippingStatus = newStatus, shippedOn = (DateTime?)null, deliveredOn = newStatus == "Delivered" ? DateTime.UtcNow : (DateTime?)null };
+      var api = new ApiCall { Client = client, Route = route, Type = Constant.ApiCallType.Update, Model = body };
+      await ApiCallHelper.ApiCallTypeCall<object>(api);
+    }
+    catch
+    {
+      await ReloadAsync();
+    }
+
+    StateHasChanged();
+  }
+
   public void Dispose()
   {
     _cts.Cancel();
     _cts.Dispose();
   }
 
-  private static RenderFragment RenderOrderCard(GetOrder o, string borderClass) => __builder =>
+  // ── CSS helpers ──
+
+  private string ColumnCss(string column, string color)
   {
-    <div class="rounded-lg border @borderClass bg-white shadow-sm">
-      <div class="px-3 py-2 flex items-center justify-between">
-        <span class="font-mono font-bold text-sm">@o.Reference</span>
-        @{ var badge = GetBadge(o.ShippingStatus); }
-        <span class="rounded-full px-2 py-0.5 text-[10px] font-bold @badge.Css">@badge.Label</span>
-      </div>
-      <div class="px-3 pb-1 text-xs text-neutral-500">
-        @(o.CustomerName ?? o.CustomerEmail ?? "(Inconnu)") &mdash; @o.CreatedOn.ToLocalTime().ToString("dd/MM HH:mm")
-      </div>
-      <div class="px-3 pb-3">
-        <ul class="divide-y divide-neutral-100 text-xs">
-          @foreach (var l in o.Lines)
-          {
-            <li class="flex items-center justify-between py-1">
-              <span class="truncate mr-2" title="@l.ProductName">@l.ProductName</span>
-              <span class="shrink-0 font-semibold">x@l.Quantity</span>
-            </li>
-          }
-        </ul>
-        <div class="mt-1.5 text-right text-xs font-bold">&euro; @o.TotalAmount.ToString("F2")</div>
-      </div>
+    var highlight = _dragOverColumn == column;
+    var (borderNormal, borderHighlight, bgNormal, bgHighlight) = color switch
+    {
+      "orange" => ("border-orange-300", "border-orange-500", "bg-orange-50/60", "bg-orange-100/80"),
+      "blue" => ("border-blue-300", "border-blue-500", "bg-blue-50/60", "bg-blue-100/80"),
+      "green" => ("border-green-300", "border-green-500", "bg-green-50/60", "bg-green-100/80"),
+      _ => ("border-neutral-300", "border-neutral-500", "bg-neutral-50/60", "bg-neutral-100/80")
+    };
+    var border = highlight ? borderHighlight : borderNormal;
+    var bg = highlight ? bgHighlight : bgNormal;
+    return $"flex flex-col rounded-xl border-2 {border} {bg} transition-colors duration-150";
+  }
+
+  private string CardCss(Guid orderId, string color)
+  {
+    var dragging = _draggedOrderId == orderId;
+    var borderCss = color switch
+    {
+      "orange" => "border-orange-300",
+      "blue" => "border-blue-300",
+      "green" => "border-green-300",
+      _ => "border-neutral-300"
+    };
+    var opacity = dragging ? " opacity-40" : "";
+    return $"cursor-grab active:cursor-grabbing rounded-lg border {borderCss} bg-white shadow-sm{opacity}";
+  }
+
+  // ── Card rendering ──
+
+  private static RenderFragment RenderCardContent(GetOrder o) => __builder =>
+  {
+    <div class="px-3 py-2 flex items-center justify-between">
+      <span class="font-mono font-bold text-sm">@o.Reference</span>
+      @{ var badge = GetBadge(o.ShippingStatus); }
+      <span class="rounded-full px-2 py-0.5 text-[10px] font-bold @badge.Css">@badge.Label</span>
+    </div>
+    <div class="px-3 pb-1 text-xs text-neutral-500">
+      @(o.CustomerName ?? o.CustomerEmail ?? "(Inconnu)") &mdash; @o.CreatedOn.ToLocalTime().ToString("dd/MM HH:mm")
+    </div>
+    <div class="px-3 pb-3">
+      <ul class="divide-y divide-neutral-100 text-xs">
+        @foreach (var l in o.Lines)
+        {
+          <li class="flex items-center justify-between py-1">
+            <span class="truncate mr-2" title="@l.ProductName">@l.ProductName</span>
+            <span class="shrink-0 font-semibold">@($"x{l.Quantity}")</span>
+          </li>
+        }
+      </ul>
+      <div class="mt-1.5 text-right text-xs font-bold">&euro; @o.TotalAmount.ToString("F2")</div>
     </div>
   };
 

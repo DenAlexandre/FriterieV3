@@ -82,7 +82,26 @@
             }
             if (codId.HasValue && checkout.PaymentMethodId == codId.Value)
             {
-                return new ServiceResponse(true, "Order placed with Cash on Delivery. You will pay upon delivery.");
+                var codReference = $"COD-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid().ToString()[..8].ToUpper()}";
+
+                var codOrder = new Order
+                {
+                    UserId = userId ?? string.Empty,
+                    Status = "Paid",
+                    Reference = codReference,
+                    TotalAmount = totalAmount,
+                    Lines = checkout.Carts.Select(ci =>
+                        new OrderLine
+                        {
+                            ProductId = ci.ProductId,
+                            Quantity = ci.Quantity,
+                            UnitPrice = products.First(p => p.Id == ci.ProductId).Price
+                        }).ToList()
+                };
+
+                await _orderRepository.CreateAsync(codOrder);
+
+                return new ServiceResponse(true, "Commande validée avec succès !");
             }
             if (bankId.HasValue && checkout.PaymentMethodId == bankId.Value)
             {

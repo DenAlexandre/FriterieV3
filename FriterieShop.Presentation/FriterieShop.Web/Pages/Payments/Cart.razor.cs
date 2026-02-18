@@ -16,6 +16,7 @@
         private IEnumerable<GetPaymentMethod> _paymentMethods = [];
         private Guid? _processingMethodId = null;
         private bool _showPaymentDialog;
+        private bool _processingQuickPay;
 
         private bool _showBtDialog;
         private BtInfo _btInfo = new();
@@ -160,6 +161,49 @@
             // Fallback to PascalCase if API happens to send it
             var pascal = char.ToUpperInvariant(name[0]) + name.Substring(1);
             return obj.TryGetProperty(pascal, out value);
+        }
+
+        private async Task QuickPayAsync()
+        {
+            _processingQuickPay = true;
+            StateHasChanged();
+
+            try
+            {
+                var cod = _paymentMethods.FirstOrDefault(m =>
+                    string.Equals(m.Name, "Cash on Delivery", StringComparison.OrdinalIgnoreCase));
+
+                if (cod is null)
+                {
+                    this.ToastService.ShowToast(ToastLevel.Error, "Méthode de paiement test introuvable.", "Checkout", ToastIcon.Error);
+                    return;
+                }
+
+                var checkout = new Checkout { PaymentMethodId = cod.Id, Carts = _myCarts };
+                var result = await this.CartService.Checkout(checkout);
+
+                if (result.Success)
+                {
+                    await this.CookieStorageService.RemoveAsync(Constant.Cart.Name);
+                    _myCarts.Clear();
+                    _selectedProducts.Clear();
+                    this.ToastService.ShowToast(ToastLevel.Success, "Commande validée avec succès !", "Checkout", ToastIcon.Success);
+                    this.NavigationManager.NavigateTo("/payment-success", true);
+                }
+                else
+                {
+                    this.ToastService.ShowToast(ToastLevel.Error, result.Message ?? "Échec du paiement.", "Checkout", ToastIcon.Error);
+                }
+            }
+            catch
+            {
+                this.ToastService.ShowToast(ToastLevel.Error, "Échec du paiement.", "Checkout", ToastIcon.Error);
+            }
+            finally
+            {
+                _processingQuickPay = false;
+                StateHasChanged();
+            }
         }
 
         private async Task SelectPaymentMethod(GetPaymentMethod paymentMethod)

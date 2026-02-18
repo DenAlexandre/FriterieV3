@@ -72,6 +72,7 @@
             public const string GetUserOrderItems = "cart/user/order-items";
             public const string GetUserOrders = "cart/user/orders";
             public const string GetAllOrders = "cart/orders";
+            public const string UpdateShippingStatus = "cart/orders"; // PUT {id}/shipping-status
         }
 
         public static class Administration
