@@ -7,5 +7,11 @@
         Task<string?> GetAsync(string name);
 
         Task RemoveAsync(string name);
+
+        Task SaveToLocalStorageAsync(string key, string value);
+
+        Task<string?> GetFromLocalStorageAsync(string key);
+
+        Task RemoveFromLocalStorageAsync(string key);
     }
 }

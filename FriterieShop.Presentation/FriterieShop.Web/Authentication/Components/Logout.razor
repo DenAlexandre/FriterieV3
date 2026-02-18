@@ -1,9 +1,30 @@
 ﻿@page "/authentication/logout"
+@using System.Security.Claims
 
 @code {
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (!firstRender) return;
+
+        try
+        {
+            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            var userId = authState.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (!string.IsNullOrEmpty(userId))
+            {
+                var cartJson = await CookieStorageService.GetAsync(Constant.Cart.Name);
+                if (!string.IsNullOrEmpty(cartJson))
+                {
+                    await CookieStorageService.SaveToLocalStorageAsync($"cart_{userId}", cartJson);
+                }
+            }
+
+            await CookieStorageService.RemoveAsync(Constant.Cart.Name);
+        }
+        catch { }
+
         await TokenService.RemoveCookie(Constant.Cookie.Name);
         NavigationManager.NavigateTo("/", true);
     }

@@ -19,12 +19,12 @@
           <DataAnnotationsValidator />
           <div class="mb-4">
             <ValidationMessage For="@(() => User.Email)" />
-            <FloatingTextInput class="w-full border rounded px-3 py-2" @bind-Value="User.Email" Label="Email Address" Type="text" Placeholder="my@email.com" />
+            <FloatingTextInput class="w-full border rounded px-3 py-2" @bind-Value="User.Email" Label="Email Address" Type="email" Placeholder="my@email.com" Autocomplete="email" />
           </div>
 
           <div class="mb-6">
             <ValidationMessage For="@(() => User.Password)" />
-            <FloatingTextInput class="w-full border rounded px-3 py-2" @bind-Value="User.Password" Label="Password" Type="Password" Placeholder="Password" />
+            <FloatingTextInput class="w-full border rounded px-3 py-2" @bind-Value="User.Password" Label="Password" Type="Password" Placeholder="Password" Autocomplete="current-password" />
           </div>
 
           <button type="submit" class="w-full inline-flex items-center justify-center rounded bg-amber-500 text-white px-4 py-2.5 font-semibold hover:bg-amber-600 shadow-sm">Login</button>

@@ -3,6 +3,7 @@
     using System.Text.Json;
 
     using FriterieShop.Web.Shared;
+    using FriterieShop.Web.Shared.Models;
     using FriterieShop.Web.Shared.Models.Payment;
     using FriterieShop.Web.Shared.Models.Product;
     using FriterieShop.Web.Shared.Toast;
@@ -165,6 +166,13 @@
 
         private async Task QuickPayAsync()
         {
+            var authState = await this.AuthStateProvider.GetAuthenticationStateAsync();
+            if (authState.User.Identity is not { IsAuthenticated: true })
+            {
+                this.NavigationManager.NavigateTo($"authentication/login/{Constant.Cart.Name}");
+                return;
+            }
+
             _processingQuickPay = true;
             StateHasChanged();
 
@@ -179,25 +187,35 @@
                     return;
                 }
 
-                var checkout = new Checkout { PaymentMethodId = cod.Id, Carts = _myCarts };
-                var result = await this.CartService.Checkout(checkout);
+                var privateClient = await this.HttpClientHelper.GetPrivateClientAsync();
+                var apiCall = new ApiCall
+                {
+                    Route = Constant.Cart.Checkout,
+                    Type = Constant.ApiCallType.Post,
+                    Client = privateClient,
+                    Model = new Checkout { PaymentMethodId = cod.Id, Carts = _myCarts }
+                };
 
-                if (result.Success)
+                var http = await this.ApiCallHelper.ApiCallTypeCall<Checkout>(apiCall);
+
+                if (http is not null && http.IsSuccessStatusCode)
                 {
                     await this.CookieStorageService.RemoveAsync(Constant.Cart.Name);
                     _myCarts.Clear();
                     _selectedProducts.Clear();
+                    StateHasChanged();
                     this.ToastService.ShowToast(ToastLevel.Success, "Commande validée avec succès !", "Checkout", ToastIcon.Success);
-                    this.NavigationManager.NavigateTo("/payment-success", true);
+                    this.NavigationManager.NavigateTo("/payment-success");
                 }
                 else
                 {
-                    this.ToastService.ShowToast(ToastLevel.Error, result.Message ?? "Échec du paiement.", "Checkout", ToastIcon.Error);
+                    var body = http is not null ? await http.Content.ReadAsStringAsync() : "Pas de réponse du serveur";
+                    this.ToastService.ShowToast(ToastLevel.Error, $"Erreur: {http?.StatusCode} - {body}", "Checkout", ToastIcon.Error);
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                this.ToastService.ShowToast(ToastLevel.Error, "Échec du paiement.", "Checkout", ToastIcon.Error);
+                this.ToastService.ShowToast(ToastLevel.Error, $"Échec: {ex.Message}", "Checkout", ToastIcon.Error);
             }
             finally
             {

@@ -22,7 +22,7 @@
       <div class="flex-1 overflow-y-auto p-3 space-y-3">
         @if (PendingOrders.Any())
         {
-          @foreach (var o in PendingOrders.OrderByDescending(x => x.CreatedOn))
+          @foreach (var o in PendingOrders.OrderBy(x => x.CreatedOn))
           {
             <div draggable="true"
                  class="@CardCss(o.Id, "orange")"
@@ -52,7 +52,7 @@
       <div class="flex-1 overflow-y-auto p-3 space-y-3">
         @if (InProgressOrders.Any())
         {
-          @foreach (var o in InProgressOrders.OrderByDescending(x => x.CreatedOn))
+          @foreach (var o in InProgressOrders.OrderBy(x => x.CreatedOn))
           {
             <div draggable="true"
                  class="@CardCss(o.Id, "blue")"
@@ -82,13 +82,21 @@
       <div class="flex-1 overflow-y-auto p-3 space-y-3">
         @if (DeliveredOrders.Any())
         {
-          @foreach (var o in DeliveredOrders.OrderByDescending(x => x.CreatedOn))
+          @foreach (var o in DeliveredOrders.OrderBy(x => x.CreatedOn))
           {
+            var order = o;
             <div draggable="true"
                  class="@CardCss(o.Id, "green")"
                  @ondragstart="() => OnDragStart(o)"
                  @ondragend="OnDragEnd">
               @RenderCardContent(o)
+              <div class="px-3 pb-3 pt-0">
+                <button class="w-full inline-flex items-center justify-center gap-1 rounded bg-green-600 text-white px-3 py-1.5 text-xs font-semibold hover:bg-green-700 transition-colors"
+                        @onclick="() => MarkAsPickedUpAsync(order)" @onclick:stopPropagation="true">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                  Livr&eacute;
+                </button>
+              </div>
             </div>
           }
         }
@@ -217,6 +225,27 @@
     }
 
     StateHasChanged();
+  }
+
+  private async Task MarkAsPickedUpAsync(GetOrder order)
+  {
+    // Optimistic UI: remove from list
+    _orders.Remove(order);
+    StateHasChanged();
+
+    try
+    {
+      var client = await HttpClientHelper.GetPrivateClientAsync();
+      var route = $"{Constant.Cart.UpdateShippingStatus}/{order.Id}/shipping-status";
+      var body = new { shippingStatus = "PickedUp", shippedOn = (DateTime?)null, deliveredOn = DateTime.UtcNow };
+      var api = new ApiCall { Client = client, Route = route, Type = Constant.ApiCallType.Update, Model = body };
+      await ApiCallHelper.ApiCallTypeCall<object>(api);
+    }
+    catch
+    {
+      await ReloadAsync();
+      StateHasChanged();
+    }
   }
 
   public void Dispose()

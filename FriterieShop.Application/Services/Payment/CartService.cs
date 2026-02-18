@@ -82,6 +82,13 @@
             }
             if (codId.HasValue && checkout.PaymentMethodId == codId.Value)
             {
+                var validCarts = checkout.Carts
+                    .Where(ci => products.Any(p => p.Id == ci.ProductId))
+                    .ToList();
+
+                if (!validCarts.Any())
+                    return new ServiceResponse(false, "Aucun produit valide dans le panier.");
+
                 var codReference = $"COD-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid().ToString()[..8].ToUpper()}";
 
                 var codOrder = new Order
@@ -90,7 +97,7 @@
                     Status = "Paid",
                     Reference = codReference,
                     TotalAmount = totalAmount,
-                    Lines = checkout.Carts.Select(ci =>
+                    Lines = validCarts.Select(ci =>
                         new OrderLine
                         {
                             ProductId = ci.ProductId,

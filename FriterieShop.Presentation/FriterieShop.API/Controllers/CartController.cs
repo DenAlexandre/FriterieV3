@@ -30,7 +30,7 @@
         /// <param name="checkout">The checkout object </param>
         /// <returns>The products in the cart </returns>
         [HttpPost("checkout")]
-        [Authorize(Roles = "User, Admin")]
+        [Authorize(Roles = "User, Admin, Cuisine")]
         public async Task<IActionResult> Checkout(Checkout checkout)
         {
             var userId = this.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

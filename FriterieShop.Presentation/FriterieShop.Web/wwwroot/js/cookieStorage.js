@@ -41,3 +41,15 @@ export function removeCookie(name, path = "/") {
 
     document.cookie = `${encodeURIComponent(name)}=; Expires=Thu, 01 Jan 1970 00:00:00 GMT; path=${path}`;
 }
+
+export function saveToLocalStorage(key, value) {
+    if (key && value) localStorage.setItem(key, value);
+}
+
+export function getFromLocalStorage(key) {
+    return key ? localStorage.getItem(key) : null;
+}
+
+export function removeFromLocalStorage(key) {
+    if (key) localStorage.removeItem(key);
+}

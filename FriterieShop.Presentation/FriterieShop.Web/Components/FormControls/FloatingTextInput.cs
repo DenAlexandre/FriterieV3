@@ -17,6 +17,9 @@
         [Parameter]
         public string? Type { get; set; } = "text";
 
+        [Parameter]
+        public string? Autocomplete { get; set; }
+
         protected override void BuildRenderTree(RenderTreeBuilder builder)
         {
             ArgumentNullException.ThrowIfNull(builder);
@@ -33,7 +36,11 @@
             builder.AddAttribute(6, "type", Type?.ToLowerInvariant() ?? "text");
             builder.AddAttribute(7, "aria-required", "true");
             builder.AddAttribute(8, "placeholder", Placeholder);
-            builder.AddAttribute(9, "oninput", EventCallback.Factory.CreateBinder<string>(
+            if (!string.IsNullOrEmpty(Autocomplete))
+            {
+                builder.AddAttribute(9, "autocomplete", Autocomplete);
+            }
+            builder.AddAttribute(10, "oninput", EventCallback.Factory.CreateBinder<string>(
                 this,
                 value => CurrentValueAsString = value,
                 current));

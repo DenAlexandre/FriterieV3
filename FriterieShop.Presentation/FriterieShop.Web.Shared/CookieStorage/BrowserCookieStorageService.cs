@@ -52,6 +52,21 @@
             await _jsModuleHandler.InvokeVoidAsync("removeCookie", name);
         }
 
+        public async Task SaveToLocalStorageAsync(string key, string value)
+        {
+            await _jsModuleHandler.InvokeVoidAsync("saveToLocalStorage", key, value);
+        }
+
+        public async Task<string?> GetFromLocalStorageAsync(string key)
+        {
+            return await _jsModuleHandler.InvokeAsync<string?>("getFromLocalStorage", key);
+        }
+
+        public async Task RemoveFromLocalStorageAsync(string key)
+        {
+            await _jsModuleHandler.InvokeVoidAsync("removeFromLocalStorage", key);
+        }
+
         public async ValueTask DisposeAsync()
         {
             await _jsModuleHandler.DisposeAsync();
