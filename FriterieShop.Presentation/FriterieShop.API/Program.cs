@@ -84,7 +84,11 @@ namespace FriterieShop.API
                 {
                     app.UseSwagger();
                     app.UseSwaggerUI();
+                    app.UseHttpsRedirection();
                 }
+
+                // Health check endpoint (needed by Render in production)
+                app.MapHealthChecks("/health");
 
                 var uploadsPath = Path.Combine(builder.Environment.ContentRootPath, "uploads");
                 Directory.CreateDirectory(uploadsPath);
@@ -104,8 +108,6 @@ namespace FriterieShop.API
                 });
 
                 app.UseInfrastructure();
-
-                app.UseHttpsRedirection();
 
                 app.UseAuthentication();
                 app.UseAuthorization();

@@ -1,0 +1,43 @@
+databases:
+  - name: friterieshop-db
+    plan: free
+    databaseName: db_shop
+    user: friterie
+
+services:
+  # -- API (.NET 10) --
+  - type: web
+    name: friterieshop-api
+    runtime: docker
+    plan: free
+    dockerfilePath: ./FriterieShop.Presentation/FriterieShop.API/Dockers/Dockerfile
+    dockerContext: .
+    envVars:
+      - key: ConnectionStrings__DefaultConnection
+        fromDatabase:
+          name: friterieshop-db
+          property: connectionString
+      - key: Jwt__Key
+        generateValue: true
+      - key: Jwt__Issuer
+        value: https://friterieshop-api.onrender.com
+      - key: Jwt__Audience
+        value: https://friterieshop-api.onrender.com
+      - key: ASPNETCORE_URLS
+        value: http://+:8080
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+    healthCheckPath: /health
+
+  # -- Frontend (Blazor WASM + Nginx) --
+  - type: web
+    name: friterieshop-web
+    runtime: docker
+    plan: free
+    dockerfilePath: ./FriterieShop.Presentation/FriterieShop.Web/Dockers/Dockerfile
+    dockerContext: .
+    envVars:
+      - key: API_BASE_URL
+        value: https://friterieshop-api.onrender.com/api/
+      - key: PORT
+        value: "10000"
