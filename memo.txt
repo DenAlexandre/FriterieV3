@@ -10,7 +10,8 @@ login:
 den.alexandre@gmail.com
 Alex@ndre235
 
-
+john.alexandre@gmail.com
+John@123
 
 
 
@@ -68,3 +69,34 @@ docker compose logs -f
 
 //Pour tester l'aPI
 docker build -f FriterieShop.Presentation/FriterieShop.API/Dockers/Dockerfile -t friterie-api:latest ./Friterie.API
+
+
+
+
+
+
+
+
+
+
+  ┌──────────────┬─────────────────────────────────────────────────────────────────────────────────────┐
+  │  Categorie   │                                      Produits                                       │
+  ├──────────────┼─────────────────────────────────────────────────────────────────────────────────────┤
+  │ Burgers (6)  │ Le Barbare, Le Viking, Le Classique, Le Chicken Burger, Le Double Cheese, Le Veggie │
+  ├──────────────┼─────────────────────────────────────────────────────────────────────────────────────┤
+  │ Sauces (6)   │ Andalouse, Samourai, Bresilienne, Mayonnaise Maison, Ketchup, Americaine            │
+  ├──────────────┼─────────────────────────────────────────────────────────────────────────────────────┤
+  │ Frites (4)   │ Petite, Moyenne, Grande, Patate Douce                                               │
+  ├──────────────┼─────────────────────────────────────────────────────────────────────────────────────┤
+  │ Boissons (5) │ Coca-Cola, Fanta, Eau Plate, Ice Tea, Limonade Artisanale                           │
+  ├──────────────┼─────────────────────────────────────────────────────────────────────────────────────┤
+  │ Menus (4)    │ Menu Barbare, Menu Viking, Menu Enfant, Menu Mega                                   │
+  ├──────────────┼─────────────────────────────────────────────────────────────────────────────────────┤
+  │ Snacks (5)   │ Fricadelle, Boulette, Mitraillette, Nuggets, Onion Rings                            │
+  └──────────────┴─────────────────────────────────────────────────────────────────────────────────────┘
+
+  - Chaque produit a un nom, description en francais, prix realiste, quantite en stock, et une image Unsplash (photos
+  gratuites de nourriture)
+  - Le seeder ne s'execute que si la table Categories est vide (if (await db.Categories.AnyAsync()) return)
+  - Appele automatiquement au demarrage de l'API dans Program.cs apres EnsureCreated()
+  - Pour repartir de zero : vider la DB et relancer l'API

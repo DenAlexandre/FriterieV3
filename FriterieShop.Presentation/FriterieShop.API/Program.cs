@@ -71,6 +71,9 @@ namespace FriterieShop.API
                     db.Database.EnsureCreated();
                 }
 
+                // Seed sample data (categories, products) if empty
+                SampleDataSeeder.SeedAsync(app.Services).GetAwaiter().GetResult();
+
                 app.UseCors();
                 //app.UseCors("Frontend");
 

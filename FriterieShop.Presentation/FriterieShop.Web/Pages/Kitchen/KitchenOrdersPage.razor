@@ -1,106 +1,109 @@
 @page "/kitchen"
 @layout KitchenLayout
 
-<section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-8 mb-12 sm:mb-16">
-  <div class="rounded-xl bg-white/80 shadow p-6" style="min-height: 600px; overflow: auto">
-    <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-      <h2 class="text-2xl font-bold">Commandes Cuisine</h2>
-      <button class="inline-flex items-center rounded bg-neutral-900 text-white px-3 py-1 text-sm font-semibold hover:bg-neutral-800" @onclick="ReloadAsync">Rafra&icirc;chir</button>
-    </header>
+<section class="mx-auto max-w-full px-4 sm:px-6 lg:px-8 mt-6 mb-12">
+  <header class="flex items-center justify-between mb-4">
+    <h2 class="text-2xl font-bold">Commandes Cuisine</h2>
+    <button class="inline-flex items-center rounded bg-neutral-900 text-white px-3 py-1 text-sm font-semibold hover:bg-neutral-800" @onclick="ReloadAsync">Rafra&icirc;chir</button>
+  </header>
 
-    @* Tabs *@
-    <div class="mt-4 flex border-b border-neutral-300">
-      <button class="px-4 py-2 text-sm font-semibold transition-colors @(_activeTab == Tab.EnPaiement ? "border-b-2 border-orange-500 text-orange-700" : "text-neutral-500 hover:text-neutral-700")" @onclick='() => _activeTab = Tab.EnPaiement'>
-        En paiement <span class="ml-1 rounded-full bg-orange-100 text-orange-700 px-2 py-0.5 text-xs font-bold">@PendingOrders.Count()</span>
-      </button>
-      <button class="px-4 py-2 text-sm font-semibold transition-colors @(_activeTab == Tab.EnCours ? "border-b-2 border-blue-500 text-blue-700" : "text-neutral-500 hover:text-neutral-700")" @onclick='() => _activeTab = Tab.EnCours'>
-        En cours <span class="ml-1 rounded-full bg-blue-100 text-blue-700 px-2 py-0.5 text-xs font-bold">@InProgressOrders.Count()</span>
-      </button>
-      <button class="px-4 py-2 text-sm font-semibold transition-colors @(_activeTab == Tab.Termine ? "border-b-2 border-green-500 text-green-700" : "text-neutral-500 hover:text-neutral-700")" @onclick='() => _activeTab = Tab.Termine'>
-        Termin&eacute; <span class="ml-1 rounded-full bg-green-100 text-green-700 px-2 py-0.5 text-xs font-bold">@DeliveredOrders.Count()</span>
-      </button>
-    </div>
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-4" style="min-height:75vh">
 
-    @* Orders list *@
-    <div class="mt-4 space-y-3">
-      @{ var filtered = ActiveOrders; }
-      @if (filtered.Any())
-      {
-        @foreach (var o in filtered.OrderByDescending(x => x.CreatedOn))
+    @* ── Colonne 1 : En attente ── *@
+    <div class="flex flex-col rounded-xl border-2 border-orange-300 bg-orange-50/60">
+      <div class="sticky top-0 z-10 flex items-center justify-between px-4 py-3 bg-orange-100 rounded-t-xl border-b border-orange-300">
+        <h3 class="font-bold text-orange-800">En attente</h3>
+        <span class="rounded-full bg-orange-200 text-orange-900 px-2.5 py-0.5 text-xs font-bold">@PendingOrders.Count()</span>
+      </div>
+      <div class="flex-1 overflow-y-auto p-3 space-y-3">
+        @if (PendingOrders.Any())
         {
-          <div class="rounded border">
-            <div class="px-4 py-3 bg-neutral-50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-              <div class="text-sm space-y-0.5">
-                <div><span class="font-semibold">Ref:</span> @o.Reference</div>
-                <div class="text-xs text-neutral-600">@(o.CustomerName ?? o.CustomerEmail ?? "(Inconnu)") &mdash; @o.CreatedOn.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</div>
-              </div>
-              <div>
-                @{ var badge = GetBadge(o.ShippingStatus); }
-                <span class="inline-block rounded-full px-2.5 py-0.5 text-xs font-bold @badge.Css">@badge.Label</span>
-              </div>
-            </div>
-            <div class="p-3 overflow-x-auto">
-              <table class="min-w-full text-xs table-fixed">
-                <colgroup>
-                  <col class="w-[60%]" />
-                  <col class="w-[12%]" />
-                  <col class="w-[14%]" />
-                  <col class="w-[14%]" />
-                </colgroup>
-                <thead>
-                  <tr class="bg-neutral-50 text-left">
-                    <th class="px-2 py-1">Produit</th>
-                    <th class="px-2 py-1">Qt&eacute;</th>
-                    <th class="px-2 py-1">P.U. (&euro;)</th>
-                    <th class="px-2 py-1">Total (&euro;)</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-neutral-200">
-                  @foreach (var l in o.Lines)
-                  {
-                    <tr class="align-middle h-9">
-                      <td class="px-2 py-1 truncate" title="@l.ProductName">@l.ProductName</td>
-                      <td class="px-2 py-1">@l.Quantity</td>
-                      <td class="px-2 py-1">@l.UnitPrice.ToString("F2")</td>
-                      <td class="px-2 py-1">@((l.UnitPrice * l.Quantity).ToString("F2"))</td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
-              <div class="mt-2 text-right text-sm font-semibold">Total: &euro; @o.TotalAmount.ToString("F2")</div>
-            </div>
-          </div>
+          @foreach (var o in PendingOrders.OrderByDescending(x => x.CreatedOn))
+          {
+            @RenderOrderCard(o, "border-orange-300")
+          }
         }
-      }
-      else
-      {
-        <div class="mt-6 rounded-md bg-blue-50 text-blue-800 px-6 py-5 text-center shadow font-semibold">Aucune commande</div>
-      }
+        else
+        {
+          <div class="text-center text-sm text-orange-400 py-8">Aucune commande</div>
+        }
+      </div>
     </div>
+
+    @* ── Colonne 2 : En cours ── *@
+    <div class="flex flex-col rounded-xl border-2 border-blue-300 bg-blue-50/60">
+      <div class="sticky top-0 z-10 flex items-center justify-between px-4 py-3 bg-blue-100 rounded-t-xl border-b border-blue-300">
+        <h3 class="font-bold text-blue-800">En cours</h3>
+        <span class="rounded-full bg-blue-200 text-blue-900 px-2.5 py-0.5 text-xs font-bold">@InProgressOrders.Count()</span>
+      </div>
+      <div class="flex-1 overflow-y-auto p-3 space-y-3">
+        @if (InProgressOrders.Any())
+        {
+          @foreach (var o in InProgressOrders.OrderByDescending(x => x.CreatedOn))
+          {
+            @RenderOrderCard(o, "border-blue-300")
+          }
+        }
+        else
+        {
+          <div class="text-center text-sm text-blue-400 py-8">Aucune commande</div>
+        }
+      </div>
+    </div>
+
+    @* ── Colonne 3 : Terminé ── *@
+    <div class="flex flex-col rounded-xl border-2 border-green-300 bg-green-50/60">
+      <div class="sticky top-0 z-10 flex items-center justify-between px-4 py-3 bg-green-100 rounded-t-xl border-b border-green-300">
+        <h3 class="font-bold text-green-800">Termin&eacute;</h3>
+        <span class="rounded-full bg-green-200 text-green-900 px-2.5 py-0.5 text-xs font-bold">@DeliveredOrders.Count()</span>
+      </div>
+      <div class="flex-1 overflow-y-auto p-3 space-y-3">
+        @if (DeliveredOrders.Any())
+        {
+          @foreach (var o in DeliveredOrders.OrderByDescending(x => x.CreatedOn))
+          {
+            @RenderOrderCard(o, "border-green-300")
+          }
+        }
+        else
+        {
+          <div class="text-center text-sm text-green-400 py-8">Aucune commande</div>
+        }
+      </div>
+    </div>
+
   </div>
 </section>
 
+@implements IDisposable
+
 @code {
   private List<GetOrder> _orders = new();
-  private Tab _activeTab = Tab.EnPaiement;
-
-  private enum Tab { EnPaiement, EnCours, Termine }
+  private CancellationTokenSource _cts = new();
+  private const int PollIntervalSeconds = 15;
 
   private IEnumerable<GetOrder> PendingOrders => _orders.Where(o => o.ShippingStatus == "PendingShipment");
   private IEnumerable<GetOrder> InProgressOrders => _orders.Where(o => o.ShippingStatus is "Shipped" or "InTransit" or "OutForDelivery");
   private IEnumerable<GetOrder> DeliveredOrders => _orders.Where(o => o.ShippingStatus == "Delivered");
 
-  private IEnumerable<GetOrder> ActiveOrders => _activeTab switch
-  {
-    Tab.EnPaiement => PendingOrders,
-    Tab.EnCours => InProgressOrders,
-    Tab.Termine => DeliveredOrders,
-    _ => _orders
-  };
-
   protected override async Task OnInitializedAsync()
   {
     await ReloadAsync();
+    _ = PollOrdersAsync();
+  }
+
+  private async Task PollOrdersAsync()
+  {
+    var timer = new PeriodicTimer(TimeSpan.FromSeconds(PollIntervalSeconds));
+    try
+    {
+      while (await timer.WaitForNextTickAsync(_cts.Token))
+      {
+        await ReloadAsync();
+        await InvokeAsync(StateHasChanged);
+      }
+    }
+    catch (OperationCanceledException) { }
   }
 
   private async Task ReloadAsync()
@@ -113,15 +116,47 @@
         : (await ApiCallHelper.GetServiceResponse<IEnumerable<GetOrder>>(http)).ToList();
   }
 
+  public void Dispose()
+  {
+    _cts.Cancel();
+    _cts.Dispose();
+  }
+
+  private static RenderFragment RenderOrderCard(GetOrder o, string borderClass) => __builder =>
+  {
+    <div class="rounded-lg border @borderClass bg-white shadow-sm">
+      <div class="px-3 py-2 flex items-center justify-between">
+        <span class="font-mono font-bold text-sm">@o.Reference</span>
+        @{ var badge = GetBadge(o.ShippingStatus); }
+        <span class="rounded-full px-2 py-0.5 text-[10px] font-bold @badge.Css">@badge.Label</span>
+      </div>
+      <div class="px-3 pb-1 text-xs text-neutral-500">
+        @(o.CustomerName ?? o.CustomerEmail ?? "(Inconnu)") &mdash; @o.CreatedOn.ToLocalTime().ToString("dd/MM HH:mm")
+      </div>
+      <div class="px-3 pb-3">
+        <ul class="divide-y divide-neutral-100 text-xs">
+          @foreach (var l in o.Lines)
+          {
+            <li class="flex items-center justify-between py-1">
+              <span class="truncate mr-2" title="@l.ProductName">@l.ProductName</span>
+              <span class="shrink-0 font-semibold">x@l.Quantity</span>
+            </li>
+          }
+        </ul>
+        <div class="mt-1.5 text-right text-xs font-bold">&euro; @o.TotalAmount.ToString("F2")</div>
+      </div>
+    </div>
+  };
+
   private record BadgeInfo(string Label, string Css);
 
   private static BadgeInfo GetBadge(string status) => status switch
   {
-    "PendingShipment" => new("En paiement", "bg-orange-100 text-orange-800"),
+    "PendingShipment" => new("En attente", "bg-orange-100 text-orange-800"),
     "Shipped" => new("Exp\u00e9di\u00e9", "bg-blue-100 text-blue-800"),
     "InTransit" => new("En transit", "bg-indigo-100 text-indigo-800"),
     "OutForDelivery" => new("En livraison", "bg-purple-100 text-purple-800"),
-    "Delivered" => new("Livr\u00e9", "bg-green-100 text-green-800"),
+    "Delivered" => new("Termin\u00e9", "bg-green-100 text-green-800"),
     _ => new(status, "bg-neutral-100 text-neutral-800")
   };
 }
