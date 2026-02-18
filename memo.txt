@@ -100,3 +100,54 @@ docker build -f FriterieShop.Presentation/FriterieShop.API/Dockers/Dockerfile -t
   - Le seeder ne s'execute que si la table Categories est vide (if (await db.Categories.AnyAsync()) return)
   - Appele automatiquement au demarrage de l'API dans Program.cs apres EnsureCreated()
   - Pour repartir de zero : vider la DB et relancer l'API
+  
+  
+  
+  
+  
+  
+   Creer un compte Render
+
+  - Va sur https://render.com et connecte-toi avec ton compte GitHub
+
+  3. Deployer via Blueprint (methode la plus simple)
+
+  1. Va sur Dashboard → New → Blueprint
+  2. Connecte ton repo GitHub FriterieV3
+  3. Selectionne la branche br_claude (ou main si tu merges d'abord)
+  4. Render detecte automatiquement le render.yaml et propose de creer :
+    - friterieshop-db (PostgreSQL gratuit)
+    - friterieshop-api (Web Service Docker)
+    - friterieshop-web (Web Service Docker)
+  5. Clique Apply et attends le deploiement (~5-10 min pour le premier build)
+
+  4. Mettre a jour les URLs reelles
+
+  Une fois les services crees, Render attribue des URLs (ex: friterieshop-api-xxxx.onrender.com). Si elles different du
+  nom prevu :
+
+  1. Dashboard → friterieshop-api → copie l'URL reelle
+  2. Dashboard → friterieshop-api → Environment → modifie :
+    - Jwt__Issuer = https://<url-reelle-api>
+    - Jwt__Audience = https://<url-reelle-api>
+  3. Dashboard → friterieshop-web → Environment → modifie :
+    - API_BASE_URL = https://<url-reelle-api>/api/
+  4. Aussi mettre a jour appsettings.Production.json dans le code avec la bonne URL, puis repusher
+
+  5. Verifier
+
+  - Ouvre l'URL du frontend (ex: https://friterieshop-web-xxxx.onrender.com)
+  - Teste : navigation, login, ajout au panier
+
+  Rappels tier gratuit
+
+  - Premier chargement lent (~30s) : les services gratuits s'eteignent apres 15 min d'inactivite
+  - PostgreSQL : supprime apres 90 jours
+  - 512 MB RAM par service
+  - Les uploads d'images ne persistent pas entre redeploiements (pas de volume persistant sur le tier gratuit)
+
+  
+  
+  
+  
+  
