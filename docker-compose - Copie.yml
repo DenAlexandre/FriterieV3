@@ -18,7 +18,7 @@ services:
     depends_on:
       - postgres
     environment:
-      ConnectionStrings__Postgres: "Host=postgres;Database=db_shop;Username=postgres;Password=postgres"
+      ConnectionStrings__Postgres: "Host=postgres;Database=db-shop;Username=postgres;Password=postgres"
       ASPNETCORE_URLS: "http://+:80"
     ports:
       - "7258:80"

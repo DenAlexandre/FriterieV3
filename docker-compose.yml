@@ -28,7 +28,7 @@ services:
     networks:
       - friterieshop-network
     environment:
-      ConnectionStrings__Postgres: "Host=postgres;Database=db_shop;Username=postgres;Password=postgres"
+      ConnectionStrings__Postgres: "Host=postgres;Database=db-shop;Username=postgres;Password=postgres"
       ASPNETCORE_URLS: "http://+:8080"
     ports:
       - "5282:8080"

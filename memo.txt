@@ -110,6 +110,9 @@ docker build -f FriterieShop.Presentation/FriterieShop.API/Dockers/Dockerfile -t
 
   - Va sur https://render.com et connecte-toi avec ton compte GitHub
 
+
+
+
   3. Deployer via Blueprint (methode la plus simple)
 
   1. Va sur Dashboard → New → Blueprint

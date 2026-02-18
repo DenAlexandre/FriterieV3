@@ -64,11 +64,23 @@ namespace FriterieShop.API
             {
                 var app = builder.Build();
 
-                // Create database schema at startup (no migrations present yet)
-                using (var scope = app.Services.CreateScope())
+                // Create database schema at startup with retry (DB may not be ready yet on Render)
+                var maxRetries = 5;
+                for (var i = 0; i < maxRetries; i++)
                 {
-                    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-                    db.Database.EnsureCreated();
+                    try
+                    {
+                        using var scope = app.Services.CreateScope();
+                        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                        db.Database.EnsureCreated();
+                        Log.Logger.Information("Database schema ensured on attempt {Attempt}", i + 1);
+                        break;
+                    }
+                    catch (Exception ex) when (i < maxRetries - 1)
+                    {
+                        Log.Logger.Warning(ex, "Database not ready (attempt {Attempt}/{Max}), retrying in 5s...", i + 1, maxRetries);
+                        Thread.Sleep(5000);
+                    }
                 }
 
                 // Seed sample data (categories, products) if empty
