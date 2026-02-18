@@ -1,0 +1,270 @@
+@page "/admin/users"
+@layout AdminLayout
+
+<section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-8 mb-12 sm:mb-16">
+    <div class="rounded-xl bg-white/80 shadow p-6" style="min-height: 600px; overflow: auto">
+        <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <h2 class="text-2xl font-bold">Gestion des utilisateurs</h2>
+            <div class="flex items-center gap-2">
+                <input class="border rounded px-2 py-1 text-sm w-60" placeholder="Rechercher par nom/email" @bind="_searchQuery" @bind:event="oninput" />
+                <button class="inline-flex items-center rounded bg-neutral-900 text-white px-3 py-1 text-sm font-semibold hover:bg-neutral-800" @onclick="ReloadAsync">Recharger</button>
+            </div>
+        </header>
+
+        <div class="mt-4 overflow-auto" style="max-height:600px">
+            @if (_users.Any())
+            {
+                <table class="min-w-full text-sm">
+                    <thead class="sticky top-0 z-10">
+                        <tr class="bg-neutral-100/90 text-left">
+                            <th class="px-3 py-2">Nom</th>
+                            <th class="px-3 py-2">Email</th>
+                            <th class="px-3 py-2">Téléphone</th>
+                            <th class="px-3 py-2 text-center">Email confirmé</th>
+                            <th class="px-3 py-2 text-center">Rôle</th>
+                            <th class="px-3 py-2 text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-neutral-200">
+                        @foreach (var user in FilteredUsers)
+                        {
+                            <tr>
+                                <td class="px-3 py-2">@user.FullName</td>
+                                <td class="px-3 py-2">@user.Email</td>
+                                <td class="px-3 py-2">@(user.PhoneNumber ?? "—")</td>
+                                <td class="px-3 py-2 text-center">
+                                    @if (user.EmailConfirmed)
+                                    {
+                                        <span class="inline-flex items-center rounded-full bg-green-100 text-green-800 px-2 py-0.5 text-xs font-medium">Confirmé</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="inline-flex items-center rounded-full bg-red-100 text-red-800 px-2 py-0.5 text-xs font-medium">Non confirmé</span>
+                                    }
+                                </td>
+                                <td class="px-3 py-2 text-center">
+                                    @{
+                                        var badgeClass = user.Role switch
+                                        {
+                                            "Admin" => "bg-amber-100 text-amber-800",
+                                            "Cuisine" => "bg-orange-100 text-orange-800",
+                                            _ => "bg-blue-100 text-blue-800"
+                                        };
+                                    }
+                                    <span class="inline-flex items-center rounded-full @badgeClass px-2 py-0.5 text-xs font-medium">@(string.IsNullOrEmpty(user.Role) ? "Aucun" : user.Role)</span>
+                                </td>
+                                <td class="px-3 py-2">
+                                    <div class="flex items-center justify-center gap-2">
+                                        <button title="Éditer" class="text-blue-600 hover:text-blue-700" @onclick="() => OpenEditDialog(user)">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+                                        </button>
+                                        <button title="Changer le rôle" class="text-amber-600 hover:text-amber-700" @onclick="() => OpenRoleDialog(user)">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4-4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+                                        </button>
+                                        <button title="Supprimer" class="text-red-600 hover:text-red-700" @onclick="() => OpenDeleteDialog(user)">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M6 7h12M9 7V5a2 2 0 012-2h2a2 2 0 012 2v2m-1 0l-1 12a2 2 0 01-2 2h-2a2 2 0 01-2-2L8 7"/></svg>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="mt-6 rounded-md bg-blue-50 text-blue-800 px-6 py-5 text-center shadow font-semibold">
+                    Aucun utilisateur trouvé.
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- Edit User Dialog -->
+<ModalDialog @bind-IsVisible="_showEditDialog">
+    <Header>
+        <h5 class="text-lg font-semibold">Éditer l'utilisateur</h5>
+    </Header>
+    <Body>
+        <div class="space-y-3">
+            <div>
+                <label class="block text-sm text-neutral-700 mb-1">Nom complet</label>
+                <input class="w-full border rounded px-3 py-2" @bind="_editFullName" />
+            </div>
+            <div>
+                <label class="block text-sm text-neutral-700 mb-1">Email</label>
+                <input class="w-full border rounded px-3 py-2" type="email" @bind="_editEmail" />
+            </div>
+            <div>
+                <label class="block text-sm text-neutral-700 mb-1">Téléphone</label>
+                <input class="w-full border rounded px-3 py-2" @bind="_editPhone" />
+            </div>
+        </div>
+    </Body>
+    <Footer>
+        <button class="inline-flex items-center rounded bg-neutral-900 text-white px-4 py-2 font-semibold hover:bg-neutral-800" @onclick="SaveEditAsync">Enregistrer</button>
+        <button class="inline-flex items-center rounded bg-neutral-200 text-neutral-900 px-4 py-2 font-semibold hover:bg-neutral-300 ml-2" @onclick="() => _showEditDialog = false">Annuler</button>
+    </Footer>
+</ModalDialog>
+
+<!-- Change Role Dialog -->
+<ModalDialog @bind-IsVisible="_showRoleDialog">
+    <Header>
+        <h5 class="text-lg font-semibold">Changer le rôle</h5>
+    </Header>
+    <Body>
+        <div>
+            <label class="block text-sm text-neutral-700 mb-1">Rôle pour <strong>@_roleUserName</strong></label>
+            <select class="w-full border rounded px-3 py-2" @bind="_selectedRole">
+                <option value="User">User</option>
+                <option value="Admin">Admin</option>
+                <option value="Cuisine">Cuisine</option>
+            </select>
+        </div>
+    </Body>
+    <Footer>
+        <button class="inline-flex items-center rounded bg-neutral-900 text-white px-4 py-2 font-semibold hover:bg-neutral-800" @onclick="SaveRoleAsync">Enregistrer</button>
+        <button class="inline-flex items-center rounded bg-neutral-200 text-neutral-900 px-4 py-2 font-semibold hover:bg-neutral-300 ml-2" @onclick="() => _showRoleDialog = false">Annuler</button>
+    </Footer>
+</ModalDialog>
+
+<!-- Delete Confirmation Dialog -->
+<ModalDialog @bind-IsVisible="_showDeleteDialog">
+    <Header>
+        <h5 class="text-lg font-semibold">Confirmer la suppression</h5>
+    </Header>
+    <Body>
+        Êtes-vous sûr de vouloir supprimer l'utilisateur <strong>@_deleteUserName</strong> ?
+    </Body>
+    <Footer>
+        <button class="inline-flex items-center rounded bg-red-600 text-white px-4 py-2 font-semibold hover:bg-red-700" @onclick="ConfirmDeleteAsync">Oui, supprimer</button>
+        <button class="inline-flex items-center rounded bg-neutral-200 text-neutral-900 px-4 py-2 font-semibold hover:bg-neutral-300 ml-2" @onclick="() => _showDeleteDialog = false">Annuler</button>
+    </Footer>
+</ModalDialog>
+
+@code {
+    private List<GetUserWithRole> _users = new();
+    private string _searchQuery = string.Empty;
+
+    // Edit dialog state
+    private bool _showEditDialog;
+    private string _editUserId = string.Empty;
+    private string _editFullName = string.Empty;
+    private string _editEmail = string.Empty;
+    private string? _editPhone;
+
+    // Role dialog state
+    private bool _showRoleDialog;
+    private string _roleUserId = string.Empty;
+    private string _roleUserName = string.Empty;
+    private string _selectedRole = "User";
+
+    // Delete dialog state
+    private bool _showDeleteDialog;
+    private string _deleteUserId = string.Empty;
+    private string _deleteUserName = string.Empty;
+
+    private IEnumerable<GetUserWithRole> FilteredUsers => string.IsNullOrWhiteSpace(_searchQuery)
+        ? _users
+        : _users.Where(u =>
+            (u.FullName?.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase) ?? false) ||
+            (u.Email?.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase) ?? false));
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ReloadAsync();
+    }
+
+    private async Task ReloadAsync()
+    {
+        var client = await HttpClientHelper.GetPrivateClientAsync();
+        var api = new ApiCall { Client = client, Route = Constant.UserManagement.GetAll, Type = Constant.ApiCallType.Get };
+        var http = await ApiCallHelper.ApiCallTypeCall<object>(api);
+        _users = http is null || !http.IsSuccessStatusCode
+            ? new()
+            : (await ApiCallHelper.GetServiceResponse<List<GetUserWithRole>>(http));
+    }
+
+    private void OpenEditDialog(GetUserWithRole user)
+    {
+        _editUserId = user.Id;
+        _editFullName = user.FullName;
+        _editEmail = user.Email;
+        _editPhone = user.PhoneNumber;
+        _showEditDialog = true;
+    }
+
+    private async Task SaveEditAsync()
+    {
+        var client = await HttpClientHelper.GetPrivateClientAsync();
+        var model = new UpdateUserModel { FullName = _editFullName, Email = _editEmail, PhoneNumber = _editPhone };
+        var api = new ApiCall { Client = client, Route = $"{Constant.UserManagement.Update}/{_editUserId}", Type = Constant.ApiCallType.Update, Model = model };
+        var http = await ApiCallHelper.ApiCallTypeCall<UpdateUserModel>(api);
+
+        _showEditDialog = false;
+
+        if (http is not null && http.IsSuccessStatusCode)
+        {
+            ToastService.ShowToast(Shared.Toast.ToastLevel.Success, "Utilisateur mis à jour", "Utilisateurs");
+            await ReloadAsync();
+        }
+        else
+        {
+            ToastService.ShowToast(Shared.Toast.ToastLevel.Error, "Échec de la mise à jour", "Utilisateurs");
+        }
+    }
+
+    private void OpenRoleDialog(GetUserWithRole user)
+    {
+        _roleUserId = user.Id;
+        _roleUserName = user.FullName;
+        _selectedRole = string.IsNullOrEmpty(user.Role) ? "User" : user.Role;
+        _showRoleDialog = true;
+    }
+
+    private async Task SaveRoleAsync()
+    {
+        var client = await HttpClientHelper.GetPrivateClientAsync();
+        var api = new ApiCall { Client = client, Route = $"{Constant.UserManagement.UpdateRole}/{_roleUserId}/role", Type = Constant.ApiCallType.Update, Model = new { Role = _selectedRole } };
+        var http = await ApiCallHelper.ApiCallTypeCall<object>(api);
+
+        _showRoleDialog = false;
+
+        if (http is not null && http.IsSuccessStatusCode)
+        {
+            ToastService.ShowToast(Shared.Toast.ToastLevel.Success, "Rôle mis à jour", "Utilisateurs");
+            await ReloadAsync();
+        }
+        else
+        {
+            ToastService.ShowToast(Shared.Toast.ToastLevel.Error, "Échec de la mise à jour du rôle", "Utilisateurs");
+        }
+    }
+
+    private void OpenDeleteDialog(GetUserWithRole user)
+    {
+        _deleteUserId = user.Id;
+        _deleteUserName = user.FullName;
+        _showDeleteDialog = true;
+    }
+
+    private async Task ConfirmDeleteAsync()
+    {
+        var client = await HttpClientHelper.GetPrivateClientAsync();
+        var api = new ApiCall { Client = client, Route = $"{Constant.UserManagement.Delete}/{_deleteUserId}", Type = Constant.ApiCallType.Delete };
+        var http = await ApiCallHelper.ApiCallTypeCall<object>(api);
+
+        _showDeleteDialog = false;
+
+        if (http is not null && http.IsSuccessStatusCode)
+        {
+            ToastService.ShowToast(Shared.Toast.ToastLevel.Success, "Utilisateur supprimé", "Utilisateurs");
+            await ReloadAsync();
+        }
+        else
+        {
+            ToastService.ShowToast(Shared.Toast.ToastLevel.Error, "Échec de la suppression", "Utilisateurs");
+        }
+    }
+}

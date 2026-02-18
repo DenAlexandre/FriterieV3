@@ -82,6 +82,12 @@
                         Id = "b7af6842-02fa-4af4-8f61-ae04a49644a2",
                         Name = "User",
                         NormalizedName = "USER"
+                    },
+                new IdentityRole
+                    {
+                        Id = "c1d2e3f4-5a6b-7c8d-9e0f-1a2b3c4d5e6f",
+                        Name = "Cuisine",
+                        NormalizedName = "CUISINE"
                     });
 
             // NewsletterSubscriber config

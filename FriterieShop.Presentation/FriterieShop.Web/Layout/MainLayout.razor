@@ -25,6 +25,11 @@
                         <NavLink href="admin" class="px-3 py-1.5 rounded-md text-amber-300 hover:text-white hover:bg-amber-400/10 transition-colors" ActiveClass="bg-amber-400/20 text-white">Admin</NavLink>
                     </Authorized>
                 </AuthorizeView>
+                <AuthorizeView Roles="Cuisine">
+                    <Authorized>
+                        <NavLink href="kitchen" class="px-3 py-1.5 rounded-md text-orange-300 hover:text-white hover:bg-orange-400/10 transition-colors" ActiveClass="bg-orange-400/20 text-white">Cuisine</NavLink>
+                    </Authorized>
+                </AuthorizeView>
             </nav>
         </div>
     </div>
@@ -103,6 +108,11 @@
                     <AuthorizeView Roles="Admin">
                         <Authorized>
                             <NavLink href="admin" class="block rounded px-3 py-2 hover:bg-neutral-100 text-amber-700" ActiveClass="bg-amber-100" @onclick="CloseMobileMenu">Admin</NavLink>
+                        </Authorized>
+                    </AuthorizeView>
+                    <AuthorizeView Roles="Cuisine">
+                        <Authorized>
+                            <NavLink href="kitchen" class="block rounded px-3 py-2 hover:bg-neutral-100 text-orange-700" ActiveClass="bg-orange-100" @onclick="CloseMobileMenu">Cuisine</NavLink>
                         </Authorized>
                     </AuthorizeView>
                 </nav>

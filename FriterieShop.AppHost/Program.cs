@@ -2,25 +2,9 @@ var builder = DistributedApplication.CreateBuilder(args);
 
 
 
-// Add a Docker Compose environment
-var compose = builder.AddDockerComposeEnvironment("compose");
-
-
-//var cache = builder.AddRedis("cache")
-//                   .PublishAsDockerComposeService((resource, service) =>
-//                   {
-//                       service.Name = "cache";
-//                   });
-
-// PostgreSQL
-var postgres = builder.AddPostgres("postgres")
-    .WithImage("postgres:latest")
-    .WithHostPort(5432)
-    .WithEnvironment("POSTGRES_DB", "db_shop")
-    .WithEnvironment("POSTGRES_USER", "postgres")
-    .WithEnvironment("POSTGRES_PASSWORD", "postgres")
-    .WithDataVolume(); // persistance des données
-
+// Utilise le container PostgreSQL existant (docker-compose shop_postgres)
+// via la connection string "DefaultConnection" de appsettings.json
+var postgres = builder.AddConnectionString("DefaultConnection");
 
 var apiService = builder.AddProject<Projects.FriterieShop_API>("apiservice")
                         .WithReference(postgres)

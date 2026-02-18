@@ -108,7 +108,7 @@
         /// </summary>
         /// <returns>All orders</returns>
         [HttpGet("orders")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Cuisine")]
         public async Task<IActionResult> GetAllOrders()
         {
             // Вземане на всички поръчки (чрез новата услуга)

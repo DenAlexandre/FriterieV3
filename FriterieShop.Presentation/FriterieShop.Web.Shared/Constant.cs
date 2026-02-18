@@ -79,9 +79,22 @@
             public const string AdminRole = "Admin";
         }
 
+        public static class Kitchen
+        {
+            public const string CuisineRole = "Cuisine";
+        }
+
         public static class File
         {
             public const string Upload = "upload/image";
+        }
+
+        public static class UserManagement
+        {
+            public const string GetAll = "usermanagement/users";
+            public const string Update = "usermanagement/users";
+            public const string UpdateRole = "usermanagement/users";
+            public const string Delete = "usermanagement/users";
         }
 
         public static class Newsletter
