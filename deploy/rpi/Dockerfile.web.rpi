@@ -1,0 +1,15 @@
+# Dockerfile pour le frontend Blazor WASM sur Raspberry Pi 3 (ARM64)
+# Sert les fichiers statiques via nginx
+FROM arm64v8/nginx:alpine
+
+WORKDIR /usr/share/nginx/html
+RUN rm -rf ./*
+
+COPY ./publish/web/wwwroot .
+COPY nginx.conf /etc/nginx/conf.d/default.conf.template
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
+
+EXPOSE 80
+
+ENTRYPOINT ["/docker-entrypoint.sh"]

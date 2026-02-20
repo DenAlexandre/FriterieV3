@@ -1,0 +1,21 @@
+# Dockerfile runtime-only pour l'API sur Raspberry Pi 3 (ARM64)
+# Pas de build stage : on publie depuis le PC et on copie le résultat
+# On utilise l'image standard (pas chiseled) pour avoir curl et un shell
+# utiles pour les health checks Docker et le débogage sur le Pi
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-noble-arm64v8
+
+RUN apt-get update && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY ./publish/api /app
+WORKDIR /app
+
+ENV ASPNETCORE_URLS=http://+:8080
+ENV ASPNETCORE_ENVIRONMENT=Production
+
+EXPOSE 8080
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:8080/health || exit 1
+
+ENTRYPOINT ["dotnet", "FriterieShop.API.dll"]
