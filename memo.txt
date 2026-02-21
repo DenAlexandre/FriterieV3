@@ -6,7 +6,7 @@ https://www.myfood-loison.fr/restaurant/harnes/Z6
 
 
 login:
-
+https://friterieshop-web.onrender.com/
 den.alexandre@gmail.com
 Alex@ndre235
 
@@ -151,6 +151,32 @@ docker build -f FriterieShop.Presentation/FriterieShop.API/Dockers/Dockerfile -t
 
   
   
-  
-  
-  
+  ***********************************************************
+  Dans Render:
+● Dans DBeaver :
+
+  1. Nouvelle connexion > choisir PostgreSQL
+  2. Remplis avec les infos de l'onglet Info de ta base Render :
+
+  ┌──────────┬────────────────────────────────────────────────────┐
+  │  Champ   │                   Valeur Render                    │
+  ├──────────┼────────────────────────────────────────────────────┤
+  │ Host     │ dpg-xxx.oregon-postgres.render.com (External Host) │ dpg-d6cl6ci4d50c73a6i8ig-a.oregon-postgres.render.com/db_shop_yrzw
+  ├──────────┼────────────────────────────────────────────────────┤
+  │ Port     │ 5432                                               │
+  ├──────────┼────────────────────────────────────────────────────┤
+  │ Database │ db_shop                                            │ db_shop_yrzw  friterieshop-db
+  ├──────────┼────────────────────────────────────────────────────┤
+  │ Username │ friterie                                           │
+  ├──────────┼────────────────────────────────────────────────────┤
+  │ Password │ le mot de passe affiche dans Render                │ In947w3iDw9MMDySbGCSJ84YXyHXi48Q
+  └──────────┴────────────────────────────────────────────────────┘
+
+  3. Onglet SSL (important, sinon la connexion sera refusee) :
+    - Use SSL : cocher
+    - SSL Mode : require
+  4. Clique Test Connection puis OK
+
+  Une fois connecte, ouvre un editeur SQL et lance :
+  DELETE FROM "Products";
+  DELETE FROM "Categories";
