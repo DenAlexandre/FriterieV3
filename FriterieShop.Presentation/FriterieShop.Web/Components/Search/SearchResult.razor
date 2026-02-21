@@ -12,7 +12,7 @@
             @foreach (var product in _searchedProducts)
             {
                 <article class="rounded-xl border border-neutral-200 bg-white/80 shadow transition hover:shadow-md">
-                    <div class="relative aspect-[4/3] overflow-hidden rounded-t-xl bg-neutral-50">
+                    <div class="relative aspect-[4/3] overflow-hidden rounded-t-xl bg-neutral-50 cursor-pointer" @onclick="() => ShowDetails(product)">
                         <img src="@product.Image" alt="@product.Name" class="h-full w-full object-cover" />
                         @if (product.IsNew)
                         {
@@ -30,13 +30,12 @@
                             </div>
                         </div>
 
-                        <div class="mt-4 flex items-center justify-between">
+                        <div class="mt-4 flex items-center justify-center">
                             <button class="inline-flex items-center gap-2 rounded-md bg-neutral-900 text-white px-3 py-1.5 text-sm font-medium hover:bg-neutral-800"
                                     @onclick="() => AddItemToCart(product.Id)">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z" /><path d="M6 6 5 3H3" /></svg>
                                 Ajouter au panier
                             </button>
-                            <button class="inline-flex items-center rounded-md px-3 py-1.5 text-sm text-neutral-700 hover:text-neutral-900 hover:bg-neutral-100" @onclick="() => ShowDetails(product)">Voir le détail</button>
                         </div>
                     </div>
                 </article>
