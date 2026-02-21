@@ -33,12 +33,38 @@
 
     public static class DependencyInjection
     {
+        /// <summary>
+        /// Convertit une URI PostgreSQL (postgres://user:pass@host:port/db) en format ADO.NET
+        /// nécessaire pour Npgsql. Render fournit le format URI via fromDatabase.
+        /// </summary>
+        private static string NormalizeConnectionString(string? connectionString)
+        {
+            if (string.IsNullOrEmpty(connectionString))
+                return connectionString ?? string.Empty;
+
+            if (!connectionString.StartsWith("postgres://", StringComparison.OrdinalIgnoreCase) &&
+                !connectionString.StartsWith("postgresql://", StringComparison.OrdinalIgnoreCase))
+                return connectionString;
+
+            var uri = new Uri(connectionString);
+            var userInfo = uri.UserInfo.Split(':');
+            var username = userInfo.Length > 0 ? Uri.UnescapeDataString(userInfo[0]) : "";
+            var password = userInfo.Length > 1 ? Uri.UnescapeDataString(userInfo[1]) : "";
+            var host = uri.Host;
+            var port = uri.Port > 0 ? uri.Port : 5432;
+            var database = uri.AbsolutePath.TrimStart('/');
+
+            return $"Host={host};Port={port};Database={database};Username={username};Password={password};SSL Mode=Require;Trust Server Certificate=true";
+        }
+
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration config)
         {
+            var connectionString = NormalizeConnectionString(config.GetConnectionString("DefaultConnection"));
+
             services.AddDbContext<AppDbContext>(
                 opt => opt
                     .UseNpgsql(
-                        config.GetConnectionString("DefaultConnection"),
+                        connectionString,
                         npgsqlOptions =>
                             {
                                 npgsqlOptions.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName);
