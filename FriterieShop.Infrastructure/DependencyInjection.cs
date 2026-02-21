@@ -112,6 +112,7 @@
 
             Stripe.StripeConfiguration.ApiKey = config["Stripe:SecretKey"];
 
+            services.Configure<FrontendSettings>(config.GetSection("Frontend"));
             services.Configure<EmailSettings>(config.GetSection("EmailSettings"));
             services.Configure<BankTransferSettings>(config.GetSection("BankTransfer"));
             services.AddTransient<IEmailService, EmailService>();

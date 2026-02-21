@@ -5,10 +5,19 @@
     using FriterieShop.Application.Services.Contracts.Payment;
     using FriterieShop.Domain.Entities;
 
+    using Microsoft.Extensions.Options;
+
     using Stripe.Checkout;
 
     public class StripePaymentService : IPaymentService
     {
+        private readonly FrontendSettings _frontendSettings;
+
+        public StripePaymentService(IOptions<FrontendSettings> frontendSettings)
+        {
+            _frontendSettings = frontendSettings.Value;
+        }
+
         public async Task<ServiceResponse> Pay(decimal totalAmount, IEnumerable<Product> cartProducts, IEnumerable<ProcessCart> carts)
         {
             try
@@ -41,8 +50,8 @@
                     PaymentMethodTypes = ["card"],
                     LineItems = lineItems,
                     Mode = "payment",
-                    SuccessUrl = "https://localhost:7258/payment-success",
-                    CancelUrl = "https://localhost:7258/payment-cancel",
+                    SuccessUrl = $"{_frontendSettings.BaseUrl.TrimEnd('/')}/payment-success",
+                    CancelUrl = $"{_frontendSettings.BaseUrl.TrimEnd('/')}/payment-cancel",
                 };
 
                 var service = new SessionService();

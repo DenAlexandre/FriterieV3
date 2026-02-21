@@ -13,6 +13,8 @@
 
     using FluentValidation;
 
+    using Microsoft.Extensions.Options;
+
     public class AuthenticationService : IAuthenticationService
     {
         private readonly IAppTokenManager _tokenManager;
@@ -25,6 +27,7 @@
         private readonly IValidator<ChangePassword> _changePasswordValidator;
         private readonly IValidationService _validationService;
         private readonly IEmailService _emailService;
+        private readonly FrontendSettings _frontendSettings;
 
         public AuthenticationService(
             IAppTokenManager tokenManager,
@@ -36,7 +39,8 @@
             IValidator<LoginUser> loginUserValidator,
             IValidationService validationService,
             IValidator<ChangePassword> changePasswordValidator,
-            IEmailService emailService)
+            IEmailService emailService,
+            IOptions<FrontendSettings> frontendSettings)
         {
             _tokenManager = tokenManager;
             _userManager = userManager;
@@ -48,6 +52,7 @@
             _validationService = validationService;
             _changePasswordValidator = changePasswordValidator;
             _emailService = emailService;
+            _frontendSettings = frontendSettings.Value;
         }
 
         public async Task<ServiceResponse> CreateUser(CreateUser user)
@@ -78,7 +83,7 @@
             try
             {
                 var token = await _userManager.GenerateEmailConfirmationTokenAsync(mappedUser);
-                var confirmationLink = $"https://localhost:7258/confirm-email?userId={mappedUser.Id}&token={Uri.EscapeDataString(token)}";
+                var confirmationLink = $"{_frontendSettings.BaseUrl.TrimEnd('/')}/confirm-email?userId={mappedUser.Id}&token={Uri.EscapeDataString(token)}";
 
                 await this.SendConfirmationEmail(user.Email,
                     $"Please confirm your email by clicking <a href=\"{confirmationLink}\">here</a>.");
@@ -151,7 +156,7 @@
             if (!currentUser.EmailConfirmed)
             {
                 var token = await _userManager.GenerateEmailConfirmationTokenAsync(currentUser);
-                var confirmationLink = $"https://localhost:7258/confirm-email?userId={currentUser.Id}&token={Uri.EscapeDataString(token)}";
+                var confirmationLink = $"{_frontendSettings.BaseUrl.TrimEnd('/')}/confirm-email?userId={currentUser.Id}&token={Uri.EscapeDataString(token)}";
 
                 var pendingEmail = currentUser.Email;
                 if (!string.IsNullOrWhiteSpace(pendingEmail))

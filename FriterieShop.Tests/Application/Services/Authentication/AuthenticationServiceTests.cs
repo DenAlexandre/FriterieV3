@@ -15,6 +15,8 @@ namespace FriterieShop.Tests.Application.Services.Authentication
 
     using FluentValidation;
 
+    using Microsoft.Extensions.Options;
+
     using Moq;
 
     using Xunit;
@@ -46,6 +48,8 @@ namespace FriterieShop.Tests.Application.Services.Authentication
             _validationServiceMock = new Mock<IValidationService>();
             _emailServiceMock = new Mock<IEmailService>();
 
+            var frontendSettings = Options.Create(new FrontendSettings { BaseUrl = "https://localhost:7258" });
+
             _authenticationService = new AuthenticationService(
                 _tokenManagerMock.Object,
                 _userManagerMock.Object,
@@ -56,7 +60,8 @@ namespace FriterieShop.Tests.Application.Services.Authentication
                 _loginUserValidatorMock.Object,
                 _validationServiceMock.Object,
                 _changePasswordValidatorMock.Object,
-                _emailServiceMock.Object);
+                _emailServiceMock.Object,
+                frontendSettings);
         }
 
         [Fact]

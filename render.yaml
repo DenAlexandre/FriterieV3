@@ -25,6 +25,8 @@ services:
         value: https://friterieshop-api.onrender.com
       - key: ASPNETCORE_URLS
         value: http://+:8080
+      - key: Frontend__BaseUrl
+        value: https://friterieshop-web.onrender.com
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
     healthCheckPath: /health

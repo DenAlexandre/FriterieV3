@@ -1,9 +1,11 @@
 ﻿namespace FriterieShop.API.Controllers
 {
+    using FriterieShop.Application.DTOs;
     using FriterieShop.Application.DTOs.Payment;
     using FriterieShop.Application.Services.Contracts.Payment;
 
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.Extensions.Options;
 
     [Route("api/[controller]")]
     [ApiController]
@@ -11,11 +13,16 @@
     {
         private readonly IPaymentMethodService _paymentMethodService;
         private readonly IPayPalPaymentService _payPalPaymentService;
+        private readonly FrontendSettings _frontendSettings;
 
-        public PaymentController(IPaymentMethodService paymentMethodService, IPayPalPaymentService payPalPaymentService)
+        public PaymentController(
+            IPaymentMethodService paymentMethodService,
+            IPayPalPaymentService payPalPaymentService,
+            IOptions<FrontendSettings> frontendSettings)
         {
             _paymentMethodService = paymentMethodService;
             _payPalPaymentService = payPalPaymentService;
+            _frontendSettings = frontendSettings.Value;
         }
 
         /// <summary>
@@ -39,7 +46,7 @@
             var ok = await _payPalPaymentService.CaptureAsync(token);
             if (!ok) return BadRequest("Capture failed");
 
-            return Redirect("https://localhost:7258/payment-success");
+            return Redirect($"{_frontendSettings.BaseUrl.TrimEnd('/')}/payment-success");
         }
     }
 }

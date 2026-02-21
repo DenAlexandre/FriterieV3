@@ -28,16 +28,11 @@ services:
     networks:
       - friterieshop-network
     environment:
-      ConnectionStrings__Postgres: "Host=postgres;Database=db-shop;Username=postgres;Password=postgres"
+      ConnectionStrings__DefaultConnection: "Host=postgres;Database=db_shop;Username=postgres;Password=postgres"
+      Frontend__BaseUrl: "http://localhost:5209"
       ASPNETCORE_URLS: "http://+:8080"
     ports:
       - "5282:8080"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
 
   web:
     container_name: shop_web
@@ -49,8 +44,7 @@ services:
     networks:
       - friterieshop-network
     environment:
-      Api_BaseUrl: "http://api/api/"
-      ASPNETCORE_URLS: "http://+:80"
+      API_BASE_URL: "http://api:8080/api/"
     ports:
       - "5209:80"
 

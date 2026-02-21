@@ -14,13 +14,21 @@ namespace FriterieShop.Infrastructure.Data
             var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
             var logger = scope.ServiceProvider.GetRequiredService<ILogger<AppDbContext>>();
 
-            if (await db.Categories.AnyAsync())
+            if (await db.Products.AnyAsync())
             {
-                logger.LogInformation("Sample data already exists, skipping seed.");
+                logger.LogInformation("Products already exist, skipping seed.");
                 return;
             }
 
             logger.LogInformation("Seeding sample data...");
+
+            // Supprimer les anciennes catégories si elles existent mais sans produits
+            if (await db.Categories.AnyAsync())
+            {
+                logger.LogInformation("Removing orphan categories before reseeding...");
+                db.Categories.RemoveRange(await db.Categories.ToListAsync());
+                await db.SaveChangesAsync();
+            }
 
             // ── Categories ──
             var burgers = new Category { Id = Guid.NewGuid(), Name = "Burgers" };
