@@ -198,7 +198,7 @@ namespace FriterieShop.Infrastructure.Data
                     Price = 5.00m,
                     Quantity = 200,
                     CategoryId = frites.Id,
-                    Image = "https://images.unsplash.com/photo-1541592106381-b31e9677c0e4?w=600&h=400&fit=crop"
+                    Image = "https://images.unsplash.com/photo-1576107232684-1279f390859f?w=600&h=400&fit=crop"
                 },
                 new Product
                 {
@@ -340,7 +340,7 @@ namespace FriterieShop.Infrastructure.Data
                     Price = 9.00m,
                     Quantity = 100,
                     CategoryId = snacks.Id,
-                    Image = "https://images.unsplash.com/photo-1539518429546-845e753e8e40?w=600&h=400&fit=crop"
+                    Image = "https://images.unsplash.com/photo-1550507992-eb63ffee0571?w=600&h=400&fit=crop"
                 },
                 new Product
                 {
