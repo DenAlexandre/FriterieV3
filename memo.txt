@@ -180,3 +180,30 @@ docker build -f FriterieShop.Presentation/FriterieShop.API/Dockers/Dockerfile -t
   Une fois connecte, ouvre un editeur SQL et lance :
   DELETE FROM "Products";
   DELETE FROM "Categories";
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  Étapes côté Neon
+
+  1. Va sur https://neon.tech et crée un compte (GitHub login possible)
+  2. Clique New Project
+  3. Choisis :
+    - Project name : friterieshop
+    - Region : AWS EU West (Ireland) (le plus proche)
+    - PostgreSQL version : 17 (par défaut)
+  4. Clique Create Project
+  5. Tu verras une connection string du type :
+  postgresql://neondb_owner:xxxx@ep-xxx-xxx-123.eu-west-1.aws.neon.tech/neondb?sslmode=require
+
+  Copie-moi cette connection string (ou juste le host, user, password, database) et je configure le tout dans Render
+  pour que ton API pointe vers Neon au lieu de la base Render.
+
+  Notre code gère déjà le format URI PostgreSQL grâce au NormalizeConnectionString qu'on a ajouté, donc ça fonctionnera
+  directement.
