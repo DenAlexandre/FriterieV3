@@ -34,8 +34,8 @@
     public static class DependencyInjection
     {
         /// <summary>
-        /// Convertit une URI PostgreSQL (postgres://user:pass@host:port/db) en format ADO.NET
-        /// nécessaire pour Npgsql. Render fournit le format URI via fromDatabase.
+        /// Convertit une URI PostgreSQL (postgres://user:pass@host:port/db?params) en format ADO.NET
+        /// nécessaire pour Npgsql. Supporte Render (fromDatabase) et Neon (channel_binding).
         /// </summary>
         private static string NormalizeConnectionString(string? connectionString)
         {
@@ -54,7 +54,14 @@
             var port = uri.Port > 0 ? uri.Port : 5432;
             var database = uri.AbsolutePath.TrimStart('/');
 
-            return $"Host={host};Port={port};Database={database};Username={username};Password={password};SSL Mode=Require;Trust Server Certificate=true";
+            var result = $"Host={host};Port={port};Database={database};Username={username};Password={password};SSL Mode=Require;Trust Server Certificate=true";
+
+            // Mapper les query parameters URI vers les paramètres Npgsql
+            var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
+            if (query["channel_binding"] is string cb)
+                result += $";Channel Binding={cb}";
+
+            return result;
         }
 
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration config)
