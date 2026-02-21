@@ -4,6 +4,8 @@ namespace FriterieShop.API
     using FriterieShop.Infrastructure;
     using FriterieShop.Infrastructure.Data;
     using Microsoft.AspNetCore.Builder;
+    using Microsoft.EntityFrameworkCore;
+    using Microsoft.EntityFrameworkCore.Infrastructure;
     using Microsoft.Extensions.FileProviders;
     using Microsoft.Extensions.Hosting;
     using Serilog;
@@ -72,7 +74,15 @@ namespace FriterieShop.API
                     {
                         using var scope = app.Services.CreateScope();
                         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-                        db.Database.EnsureCreated();
+                        var created = db.Database.EnsureCreated();
+                        if (!created)
+                        {
+                            // Neon (et autres providers managés) pré-créent la base,
+                            // EnsureCreated() voit qu'elle existe et ne crée pas les tables.
+                            var creator = db.GetService<Microsoft.EntityFrameworkCore.Storage.IRelationalDatabaseCreator>();
+                            try { creator.CreateTables(); }
+                            catch { /* Tables déjà existantes, OK */ }
+                        }
                         Log.Logger.Information("Database schema ensured on attempt {Attempt}", i + 1);
                         break;
                     }
